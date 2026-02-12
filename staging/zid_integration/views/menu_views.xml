@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Main Menu -->
+    <menuitem id="menu_zid_integration_root"
+              name="Zid Integration"
+              sequence="100"
+              groups="zid_integration.group_zid_admin"
+              web_icon="zid_integration,static/description/icon.png"/>
+
+    <!-- 1. Dashboard Menu (sequence 1) -->
+    <menuitem id="menu_zid_dashboard"
+              name="Dashboard"
+              parent="menu_zid_integration_root"
+              action="action_zid_dashboard"
+              sequence="1"/>
+
+    <!-- 2. Sales Menu (sequence 2) -->
+    <menuitem id="menu_zid_sales"
+              name="Sales"
+              parent="menu_zid_integration_root"
+              sequence="2"/>
+
+    <!-- Sales Submenus -->
+    <menuitem id="menu_zid_orders"
+              name="Orders"
+              parent="menu_zid_sales"
+              action="action_zid_sale_order"
+              sequence="1"/>
+
+    <menuitem id="menu_zid_reverse_orders"
+              name="Reverse Orders"
+              parent="menu_zid_sales"
+              action="action_zid_reverse_order"
+              groups="zid_integration.group_zid_admin"
+              sequence="2"/>
+
+    <menuitem id="menu_zid_reverse_reasons"
+              name="Reverse Reasons"
+              parent="menu_zid_sales"
+              action="action_zid_reverse_reason"
+              groups="zid_integration.group_zid_admin"
+              sequence="3"/>
+
+    <!-- 3. Products Menu (sequence 3) -->
+    <menuitem id="menu_zid_products_master"
+              name="Products"
+              parent="menu_zid_integration_root"
+              sequence="3"/>
+
+    <!-- Products Submenus -->
+    <menuitem id="menu_zid_products"
+              name="Products"
+              parent="menu_zid_products_master"
+              action="action_zid_product"
+              sequence="1"/>
+
+    <menuitem id="menu_zid_variants"
+              name="Product Variants"
+              parent="menu_zid_products_master"
+              action="action_zid_variant"
+              sequence="2"/>
+
+    <menuitem id="menu_zid_attributes"
+              name="Attributes"
+              parent="menu_zid_products_master"
+              action="action_zid_attribute"
+              groups="zid_integration.group_zid_admin"
+              sequence="3"/>
+
+    <menuitem id="menu_zid_variant_stock"
+              name="Variant Stock"
+              parent="menu_zid_products_master"
+              action="action_zid_variant_stock_line"
+              groups="zid_integration.group_zid_admin"
+              sequence="4"/>
+
+    <menuitem id="menu_zid_product_lines"
+              name="Product Lines"
+              parent="menu_zid_products_master"
+              action="action_zid_product_line"
+              groups="zid_integration.group_zid_admin"
+              sequence="5"/>
+
+    <menuitem id="menu_zid_product_errors"
+              name="Sync Errors"
+              parent="menu_zid_products_master"
+              action="action_product_zid_errors"
+              groups="zid_integration.group_zid_admin"
+              sequence="9"/>
+
+    <!-- 4. Operations Menu (sequence 4) -->
+    <menuitem id="menu_zid_operations"
+              name="Operations"
+              parent="menu_zid_integration_root"
+              sequence="4"/>
+
+    <!-- Operations Submenus -->
+    <menuitem id="menu_zid_bulk_sync"
+              name="Bulk Sync All Data"
+              parent="menu_zid_operations"
+              action="action_zid_bulk_sync_wizard"
+              sequence="1"/>
+
+    <menuitem id="menu_zid_abandoned_cart_fetch"
+              name="Fetch Abandoned Carts"
+              parent="menu_zid_operations"
+              action="action_zid_abandoned_cart_fetch_wizard"
+              groups="zid_integration.group_zid_admin"
+              sequence="2"/>
+
+    <!-- 5. Logs Menu (sequence 5) -->
+    <menuitem id="menu_zid_logs"
+              name="Logs"
+              parent="menu_zid_integration_root"
+              sequence="5"/>
+
+    <!-- Logs Submenus -->
+    <menuitem id="menu_zid_queues"
+              name="Queues"
+              parent="menu_zid_logs"
+              action="action_zid_queue_ept"
+              sequence="1"/>
+
+    <menuitem id="menu_zid_stock_logs"
+              name="Stock Update Logs"
+              parent="menu_zid_logs"
+              action="action_zid_stock_update_log"
+              sequence="2"/>
+
+    <menuitem id="menu_zid_webhooks"
+              name="Webhooks"
+              parent="menu_zid_logs"
+              action="action_zid_webhooks"
+              groups="zid_integration.group_zid_admin"
+              sequence="3"/>
+
+    <!-- 6. Reporting Menu (sequence 6) - Placeholder for future -->
+    <!-- 
+    <menuitem id="menu_zid_reporting"
+              name="Reporting"
+              parent="menu_zid_integration_root"
+              sequence="6"/>
+    -->
+
+    <!-- 7. Configuration Menu (sequence 7) -->
+    <menuitem id="menu_zid_configuration"
+              name="Configuration"
+              parent="menu_zid_integration_root"
+              groups="zid_integration.group_zid_admin"
+              sequence="7"/>
+
+    <!-- Configuration Submenus -->
+    <menuitem id="menu_zid_connectors"
+              name="Connectors"
+              parent="menu_zid_configuration"
+              action="action_zid_connector"
+              sequence="1"/>
+
+    <menuitem id="menu_zid_locations"
+              name="Zid Locations"
+              parent="menu_zid_configuration"
+              action="action_zid_location"
+              sequence="2"/>
+
+    <menuitem id="menu_zid_payment_mappings"
+              name="Payment Mappings"
+              parent="menu_zid_configuration"
+              action="action_zid_payment_mapping"
+              sequence="3"/>
+
+</odoo>

@@ -1,0 +1,28 @@
+<odoo>
+    <template id="product_price" inherit_id="website_sale.product_price">
+        <xpath expr="//div[@itemprop='offers']" position="after">
+            <t t-if="website.currency_id.name in ['AED', 'SAR', 'KWD', 'BHD', 'EGP']">
+                <div id="TabbyPromo" />
+                <br />
+                <script src="https://checkout.tabby.ai/tabby-promo.js" />
+                <script>
+                    const price = <t t-out="combination_info['price']" />;
+                    const currency = "<t t-out='website.currency_id.name' />";
+                    const lang = "<t t-out="lang" />";
+                    const publicAPIKey = "<t t-out="public_API_key"/>";
+                    const merchantCode = "<t t-out="merchant_code"/>";
+                    new TabbyPromo({
+                    selector: '#TabbyPromo',
+                    currency: currency,
+                    price: price,
+                    installmentsCount: 4,
+                    lang: lang,
+                    source: 'product',
+                    publicKey: publicAPIKey,
+                    merchantCode: merchantCode 
+                    });
+                </script>
+            </t>
+        </xpath>
+    </template>
+</odoo>

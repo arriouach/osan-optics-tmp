@@ -1,0 +1,21 @@
+{
+    "name": "Tabby Payment Provider",
+    "category": "Accounting/Payment",
+    "summary": "Payment Provider: Tabby Implementation",
+    "version": "18.0.1.0.0",
+    "author": "Odoo PS",
+    "website": "https://www.odoo.com",
+    "depends": ["website_sale", "payment"],
+    "data": [
+        "views/tabby_templates.xml",
+        "data/payment_method_data.xml",
+        "data/payment_provider_data.xml",
+        "views/payment_provider_views.xml",
+        "views/website_sale_templates.xml",
+        "views/payment_views.xml",
+    ],
+    "application": True,
+    "post_init_hook": "post_init_hook",
+    "uninstall_hook": "uninstall_hook",
+    "license": "OEEL-1",
+}

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo noupdate="1">
+    <record id="ir_rule_res_users_pos_configs" model="ir.rule">
+        <field name="name">Restrict Session Access</field>
+        <field name="model_id" ref="point_of_sale.model_pos_config"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('id', 'in', user.pos_config_ids.ids)]</field>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_pos_order_user_access" model="ir.rule">
+        <field name="name">Allow only orders assigned to user's POS</field>
+        <field name="model_id" ref = "point_of_sale.model_pos_order"></field>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('config_id.id', 'in', user.pos_config_ids.ids)]</field>
+    </record>
+
+    <record id="rule_pos_session_user_access" model="ir.rule">
+        <field name="name">Allow only sessions assigned to user's POS</field>
+        <field name="model_id" ref = "point_of_sale.model_pos_session"></field>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('config_id.id', 'in', user.pos_config_ids.ids)]</field>
+    </record>
+
+    <record id="rule_pos_payment_user_access" model="ir.rule">
+        <field name="name">Allow only payments assigned to user's POS</field>
+        <field name="model_id" ref = "point_of_sale.model_pos_payment"></field>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('pos_order_id.config_id.id', 'in', user.pos_config_ids.ids)]</field>
+    </record>
+
+    <record id="rule_report_pos_order_user_access" model="ir.rule">
+        <field name="name">Allow only reports assigned to user's POS</field>
+        <field name="model_id" ref = "point_of_sale.model_report_pos_order"></field>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('config_id.id', 'in', user.pos_config_ids.ids)]</field>
+    </record>
+
+    <record id="rule_pos_order_line_user_access" model="ir.rule">
+        <field name="name">Allow only order lines assigned to user's POS</field>
+        <field name="model_id" ref = "point_of_sale.model_pos_order_line"></field>
+        <field name="domain_force">[(1,'=',1)] if not user.pos_config_ids.ids or user.has_group('base.group_system') else [('order_id.config_id.id', 'in', user.pos_config_ids.ids)]</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Zid fields to Sale Order form -->
+    <record id="view_order_form_zid_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.zid.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Zid reference fields in the header -->
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="zid_order_ref" readonly="1" invisible="not zid_order_ref"/>
+            </xpath>
+            
+            <!-- Add Zid order link in the button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_zid_order" type="object" class="oe_stat_button" icon="fa-external-link" invisible="not zid_order_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">View Zid Order</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Zid fields to Sale Order tree view -->
+    <record id="view_quotation_tree_zid_inherit" model="ir.ui.view">
+        <field name="name">sale.order.tree.zid.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="zid_order_ref" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Zid fields to Sale Order list view -->
+    <record id="view_order_tree_zid_inherit" model="ir.ui.view">
+        <field name="name">sale.order.tree.zid.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="zid_order_ref" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

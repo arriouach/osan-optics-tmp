@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="zid_connector_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Connector Multi-Company</field>
+            <field name="model_id" ref="model_zid_connector"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="zid_sale_order_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Sale Order Multi-Company</field>
+            <field name="model_id" ref="model_zid_sale_order"/>
+            <field name="domain_force">['|', ('zid_connector_id.company_id', '=', False), ('zid_connector_id.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="zid_product_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Product Multi-Company</field>
+            <field name="model_id" ref="model_zid_product"/>
+            <field name="domain_force">['|', ('zid_connector_id.company_id', '=', False), ('zid_connector_id.company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="zid_queue_ept_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Queue Multi-Company</field>
+            <field name="model_id" ref="model_zid_queue_ept"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="zid_payment_mapping_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Payment Mapping Multi-Company</field>
+            <field name="model_id" ref="model_zid_payment_mapping"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="zid_webhook_multi_company_rule" model="ir.rule">
+            <field name="name">Zid Webhook Multi-Company</field>
+            <field name="model_id" ref="model_zid_webhook"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+    </data>
+</odoo>

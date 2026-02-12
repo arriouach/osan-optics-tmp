@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Products Import Wizard Form View -->
+    <record id="view_zid_products_connector_form" model="ir.ui.view">
+        <field name="name">zid.products.connector.form</field>
+        <field name="model">zid.products.connector</field>
+        <field name="arch" type="xml">
+            <form string="Import Products from Zid">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,importing,done"/>
+                </header>
+                <sheet>
+                    <!-- Error/Success Messages -->
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                        <h4 class="alert-heading">Import Failed!</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                        <h4 class="alert-heading">Import Completed!</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state != 'importing'">
+                        <h4 class="alert-heading">Importing...</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- Main Form -->
+                    <group invisible="state == 'done'">
+                        <group name="connector_info" string="Connector">
+                            <field name="zid_connector_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'draft'"/>
+                            <div class="text-muted" colspan="2" invisible="not last_import_date">
+                                Last import: <field name="last_import_date" widget="datetime" class="oe_inline"/>
+                                (<field name="last_import_count" class="oe_inline"/> products)
+                            </div>
+                        </group>
+
+                        <group name="import_options" string="Import Options">
+                            <field name="import_mode"
+                                   widget="radio"
+                                   readonly="state != 'draft'"/>
+                            <field name="page_size"
+                                   readonly="state != 'draft'"/>
+                            <field name="max_pages"
+                                   readonly="state != 'draft'"
+                                   help="Leave 0 to import all pages"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state == 'done'">
+                        <page string="Filters" name="filters">
+                            <group>
+                                <group string="Product Filters">
+                                    <field name="filter_published_only" readonly="state != 'draft'"/>
+                                    <field name="filter_in_stock_only" readonly="state != 'draft'"/>
+                                    <field name="skip_drafts" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Attribute Filters">
+                                    <field name="filter_by_attributes" readonly="state != 'draft'"/>
+                                    <field name="attribute_values"
+                                           placeholder="e.g., nike,black,large"
+                                           invisible="not filter_by_attributes"
+                                           required="filter_by_attributes"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Update Options" name="update_options">
+                            <div class="alert alert-info" role="alert">
+                                <strong>Granular Update Control:</strong> Select exactly what you want to update. 
+                                Unchecked options will NOT be updated, giving you complete control over the sync process.
+                            </div>
+                            
+                            <!-- Quick Selection Buttons -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <strong>Quick Selection:</strong>
+                                    <button name="action_select_all_updates" 
+                                            type="object" 
+                                            string="Select All" 
+                                            class="btn btn-sm btn-secondary ml-2"
+                                            invisible="state != 'draft'"/>
+                                    <button name="action_select_none_updates" 
+                                            type="object" 
+                                            string="Select None" 
+                                            class="btn btn-sm btn-secondary ml-1"
+                                            invisible="state != 'draft'"/>
+                                    <button name="action_select_safe_updates" 
+                                            type="object" 
+                                            string="Safe Updates Only" 
+                                            class="btn btn-sm btn-info ml-1"
+                                            invisible="state != 'draft'"
+                                            help="Select only safe updates: basic info, prices, stock quantities"/>
+                                    <button name="action_select_essential_updates" 
+                                            type="object" 
+                                            string="Essential Only" 
+                                            class="btn btn-sm btn-warning ml-1"
+                                            invisible="state != 'draft'"
+                                            help="Select only essential updates: names, prices, stock"/>
+                                </div>
+                            </div>
+                            
+                            <group>
+                                <group string="Basic Information">
+                                    <field name="update_basic_info" 
+                                           readonly="state != 'draft'"
+                                           help="Update all basic product information"/>
+                                    <div class="text-muted ml-3" invisible="not update_basic_info">
+                                        When enabled, updates: name, descriptions, SKU, barcode
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Components:" invisible="update_basic_info"/>
+                                    <field name="update_name" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_basic_info"
+                                           help="Update product name and descriptions only"/>
+                                    <field name="update_sku_barcode" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_basic_info"
+                                           help="Update SKU and barcode only"/>
+                                </group>
+                                
+                                <group string="Pricing">
+                                    <field name="update_prices" 
+                                           readonly="state != 'draft'"
+                                           help="Update all pricing information"/>
+                                    <div class="text-muted ml-3" invisible="not update_prices">
+                                        When enabled, updates: main price, sale price, cost price
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Prices:" invisible="update_prices"/>
+                                    <field name="update_main_price" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_prices"
+                                           help="Update main product price only"/>
+                                    <field name="update_sale_price" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_prices"
+                                           help="Update sale/discounted price only"/>
+                                    <field name="update_cost_price" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_prices"
+                                           help="Update cost price only"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Stock &amp; Inventory">
+                                    <field name="update_stock" 
+                                           readonly="state != 'draft'"
+                                           help="Update all stock-related information"/>
+                                    <div class="text-muted ml-3" invisible="not update_stock">
+                                        When enabled, updates: quantities, location lines, infinite stock status
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Components:" invisible="update_stock"/>
+                                    <field name="update_quantities" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_stock"
+                                           help="Update stock quantities without location data"/>
+                                    <field name="update_location_lines" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_stock"
+                                           help="Update stock by location (warehouse/store data)"/>
+                                </group>
+                                
+                                <group string="Images &amp; Media">
+                                    <field name="update_images" 
+                                           readonly="state != 'draft'"
+                                           help="Update all image-related data"/>
+                                    <div class="text-warning ml-3" invisible="not update_images">
+                                        <i class="fa fa-warning"/> Updating images may significantly slow down the import process
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Components:" invisible="update_images"/>
+                                    <field name="update_main_image" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_images"
+                                           help="Update only the main product image"/>
+                                    <field name="update_gallery_images" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_images"
+                                           help="Update product gallery/additional images"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Categories &amp; Attributes">
+                                    <field name="update_categories" 
+                                           readonly="state != 'draft'"
+                                           help="Update product categories and classifications"/>
+                                    <field name="update_attributes" 
+                                           readonly="state != 'draft'"
+                                           help="Update product attributes and variant data"/>
+                                </group>
+                                
+                                <group string="SEO &amp; Marketing">
+                                    <field name="update_seo" 
+                                           readonly="state != 'draft'"
+                                           help="Update all SEO-related data"/>
+                                    <div class="text-muted ml-3" invisible="not update_seo">
+                                        When enabled, updates: SEO titles, descriptions, keywords
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Components:" invisible="update_seo"/>
+                                    <field name="update_seo_titles" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_seo"
+                                           help="Update SEO titles without descriptions"/>
+                                    <field name="update_seo_descriptions" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_seo"
+                                           help="Update SEO descriptions without titles"/>
+                                    <field name="update_keywords" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_seo"
+                                           help="Update product keywords and tags"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Status &amp; Publishing">
+                                    <field name="update_status" 
+                                           readonly="state != 'draft'"
+                                           help="Update all status-related fields"/>
+                                    <div class="text-muted ml-3" invisible="not update_status">
+                                        When enabled, updates: published status, draft status, taxable, shipping requirements
+                                    </div>
+                                    
+                                    <separator string="Or Select Individual Components:" invisible="update_status"/>
+                                    <field name="update_publish_status" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_status"
+                                           help="Update published/unpublished status only"/>
+                                    <field name="update_draft_status" 
+                                           readonly="state != 'draft'"
+                                           invisible="update_status"
+                                           help="Update draft status only"/>
+                                </group>
+                                
+                                <group string="Additional Data">
+                                    <field name="update_weight_shipping" 
+                                           readonly="state != 'draft'"
+                                           help="Update weight and shipping requirements"/>
+                                    <field name="update_badge" 
+                                           readonly="state != 'draft'"
+                                           help="Update product badge and promotional text"/>
+                                    <field name="update_metadata" 
+                                           readonly="state != 'draft'"
+                                           help="Update advanced metadata and custom fields"/>
+                                    <field name="update_raw_data" 
+                                           readonly="state != 'draft'"
+                                           help="Update all raw JSON data fields (variants, options, etc.)"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-warning" role="alert">
+                                <strong>Important:</strong> Only selected options will be updated. 
+                                Unchecked options will remain unchanged, giving you complete control over what gets synchronized.
+                            </div>
+                        </page>
+
+                        <page string="Progress" name="progress" invisible="state == 'draft'">
+                            <group>
+                                <group string="Pages">
+                                    <field name="current_page"/>
+                                    <field name="total_pages" invisible="not total_pages"/>
+                                </group>
+                                <group string="Products">
+                                    <field name="total_products" invisible="not total_products"/>
+                                    <field name="imported_count" invisible="not imported_count"/>
+                                    <field name="updated_count" invisible="not updated_count"/>
+                                    <field name="skipped_count" invisible="not skipped_count"/>
+                                    <field name="error_count" invisible="not error_count"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Errors" name="errors" invisible="not error_log">
+                            <field name="error_log" readonly="1" nolabel="1" style="font-family: monospace;"/>
+                        </page>
+                    </notebook>
+
+                    <!-- Summary Section (shown when done) -->
+                    <div invisible="state != 'done'">
+                        <separator string="Import Summary"/>
+                        <field name="import_summary" readonly="1" nolabel="1"/>
+                    </div>
+                </sheet>
+
+                <footer>
+                    <button name="action_import_products"
+                            string="Import Products"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_view_products"
+                            string="View Products"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'done'"/>
+                    <button name="action_view_errors"
+                            string="View Errors"
+                            type="object"
+                            class="btn-warning"
+                            invisible="not error_log or state == 'draft'"/>
+                    <button string="Close"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the wizard -->
+    <record id="action_zid_products_connector" model="ir.actions.act_window">
+        <field name="name">Import Products from Zid</field>
+        <field name="res_model">zid.products.connector</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_zid_connector"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+    <!-- Menu item in Zid Connector form -->
+<!--    <record id="view_zid_connector_form_inherit_products" model="ir.ui.view">-->
+<!--        <field name="name">zid.connector.form.inherit.products</field>-->
+<!--        <field name="model">zid.connector</field>-->
+<!--        <field name="inherit_id" ref="your_module.view_zid_connector_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//header" position="inside">-->
+<!--                <button name="%(action_zid_products_connector)d"-->
+<!--                        string="Import Products"-->
+<!--                        type="action"-->
+<!--                        class="btn-primary"-->
+<!--                        invisible="authorization_status != 'connected'"/>-->
+<!--            </xpath>-->
+
+<!--&lt;!&ndash;            <xpath expr="//div[@name='button_box']" position="inside">&ndash;&gt;-->
+<!--&lt;!&ndash;                <button class="oe_stat_button"&ndash;&gt;-->
+<!--&lt;!&ndash;                        type="object"&ndash;&gt;-->
+<!--&lt;!&ndash;                        name="action_view_zid_products"&ndash;&gt;-->
+<!--&lt;!&ndash;                        icon="fa-cube"&ndash;&gt;-->
+<!--&lt;!&ndash;                        invisible="not zid_products_count">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <field string="Products"&ndash;&gt;-->
+<!--&lt;!&ndash;                           name="zid_products_count"&ndash;&gt;-->
+<!--&lt;!&ndash;                           widget="statinfo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                </button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </xpath>&ndash;&gt;-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <!-- Add fields and method to zid.connector model -->
+<!--    <record id="view_zid_connector_form_products_fields" model="ir.ui.view">-->
+<!--        <field name="name">zid.connector.form.products.fields</field>-->
+<!--        <field name="model">zid.connector</field>-->
+<!--        <field name="inherit_id" ref="your_module.view_zid_connector_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//notebook" position="inside">-->
+<!--                <page string="Products" name="products">-->
+<!--                    <group>-->
+<!--                        <group string="Product Statistics">-->
+<!--                            <field name="zid_products_count"/>-->
+<!--                            <field name="zid_products_last_sync"/>-->
+<!--                            <field name="zid_products_published_count"/>-->
+<!--                            <field name="zid_products_draft_count"/>-->
+<!--                        </group>-->
+<!--                        <group string="Sync Settings">-->
+<!--                            <field name="auto_sync_products"/>-->
+<!--                            <field name="sync_products_interval" invisible="not auto_sync_products"/>-->
+<!--                            <field name="last_products_sync_status"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+
+<!--                    <group string="Product Import Log" invisible="not products_import_log">-->
+<!--                        <field name="products_import_log" readonly="1" nolabel="1"/>-->
+<!--                    </group>-->
+<!--                </page>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+</odoo>

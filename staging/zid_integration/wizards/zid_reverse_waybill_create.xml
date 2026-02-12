@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_zid_reverse_waybill_create_form" model="ir.ui.view">
+        <field name="name">zid.reverse.waybill.create.form</field>
+        <field name="model">zid.reverse.waybill.create</field>
+        <field name="arch" type="xml">
+            <form string="Create Reverse Order Waybill">
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="has_waybill">
+                        <i class="fa fa-info-circle"/> This will create a shipping waybill for the reverse order
+                    </div>
+
+                    <div class="alert alert-warning" role="alert" invisible="not has_waybill">
+                        <i class="fa fa-exclamation-triangle"/> This reverse order already has a waybill
+                    </div>
+
+                    <group>
+                        <group string="Reverse Order Information">
+                            <field name="reverse_order_id" readonly="1"/>
+                            <field name="order_code" readonly="1"/>
+                            <field name="zid_order_id" readonly="1"/>
+                            <field name="current_state" readonly="1"/>
+                            <field name="has_waybill" invisible="1"/>
+                        </group>
+                        <group string="Waybill Settings">
+                            <field name="is_standalone_zidship_waybill"
+                                   widget="boolean_toggle"
+                                   invisible="has_waybill"/>
+                        </group>
+                    </group>
+
+                    <group string="Existing Waybill" invisible="not has_waybill">
+                        <field name="existing_waybill_id" readonly="1"/>
+                        <field name="existing_tracking_number" readonly="1"/>
+                    </group>
+
+                    <footer>
+                        <button name="action_create_waybill"
+                                string="Create Waybill"
+                                type="object"
+                                class="btn-primary"
+                                icon="fa-file-text"
+                                invisible="has_waybill"
+                                data-hotkey="q"/>
+                        <button string="Close"
+                                class="btn-secondary"
+                                special="cancel"
+                                data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for wizard -->
+    <record id="action_zid_reverse_waybill_create" model="ir.actions.act_window">
+        <field name="name">Create Waybill</field>
+        <field name="res_model">zid.reverse.waybill.create</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_reverse_order_id': id}</field>
+        <field name="binding_model_id" ref="model_zid_reverse_order"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

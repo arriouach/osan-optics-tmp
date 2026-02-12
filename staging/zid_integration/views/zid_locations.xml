@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_zid_location_tree" model="ir.ui.view">
+        <field name="name">zid.location.tree</field>
+        <field name="model">zid.location</field>
+        <field name="arch" type="xml">
+            <list string="Zid Locations" decoration-success="is_default" decoration-muted="not is_enabled">
+                <field name="display_name"/>
+                <field name="location_type"/>
+                <field name="city_name"/>
+                <field name="country_name"/>
+                <field name="is_default" widget="boolean_toggle"/>
+                <field name="is_enabled" widget="boolean_toggle"/>
+                <field name="has_stocks" widget="boolean_toggle"/>
+                <field name="fulfillment_priority"/>
+                <field name="channel_online" string="Online" optional="show"/>
+                <field name="channel_catalog" string="Catalog" optional="show"/>
+                <field name="channel_physical_store" string="Store" optional="hide"/>
+                <field name="channel_direct_sales" string="Direct" optional="hide"/>
+                <field name="last_sync_date" optional="show"/>
+                <field name="zid_connector_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zid_location_form" model="ir.ui.view">
+        <field name="name">zid.location.form</field>
+        <field name="model">zid.location</field>
+        <field name="arch" type="xml">
+            <form string="Zid Location">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_in_map"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-map-marker"
+                                string="View on Map"
+                                invisible="not latitude or not longitude"/>
+                    </div>
+
+                    <widget name="web_ribbon" title="Default" invisible="not is_default"/>
+                    <widget name="web_ribbon" title="Disabled" bg_color="bg-danger" invisible="is_enabled"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Basic Information">
+                            <field name="zid_connector_id" readonly="1"/>
+                            <field name="zid_location_id" readonly="1"/>
+                            <field name="location_type" readonly="1"/>
+                            <field name="name_en" readonly="1"/>
+                            <field name="name_ar" readonly="1"/>
+                        </group>
+                        <group string="Settings">
+                            <field name="is_default" readonly="1"/>
+                            <field name="is_enabled" readonly="1"/>
+                            <field name="is_private" readonly="1"/>
+                            <field name="has_stocks" readonly="1"/>
+                            <field name="fulfillment_priority" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Address Information">
+                        <group>
+                            <field name="full_address" readonly="1" widget="text"/>
+                            <field name="city_name" readonly="1"/>
+                            <field name="city_name_ar" readonly="1"/>
+                            <field name="city_id_zid" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="country_name" readonly="1"/>
+                            <field name="country_name_ar" readonly="1"/>
+                            <field name="country_iso_code_2" readonly="1"/>
+                            <field name="country_iso_code_3" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Coordinates" col="4">
+                        <field name="latitude" readonly="1"/>
+                        <field name="longitude" readonly="1"/>
+                    </group>
+
+                    <group string="Sales Channels">
+                        <group>
+                            <field name="channel_catalog" readonly="1"/>
+                            <field name="channel_online" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="channel_physical_store" readonly="1"/>
+                            <field name="channel_direct_sales" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Metadata">
+                        <field name="last_sync_date" readonly="1"/>
+                        <field name="active"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Raw Data" name="raw_data" groups="base.group_no_one">
+                            <field name="raw_data" readonly="1" widget="ace" options="{'mode': 'json'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zid_location_search" model="ir.ui.view">
+        <field name="name">zid.location.search</field>
+        <field name="model">zid.location</field>
+        <field name="arch" type="xml">
+            <search string="Search Zid Locations">
+                <field name="display_name"/>
+                <field name="city_name"/>
+                <field name="country_name"/>
+                <field name="zid_location_id"/>
+
+                <filter string="Default" name="filter_default" domain="[('is_default', '=', True)]"/>
+                <filter string="Enabled" name="filter_enabled" domain="[('is_enabled', '=', True)]"/>
+                <filter string="Has Stocks" name="filter_has_stocks" domain="[('has_stocks', '=', True)]"/>
+                <separator/>
+                <filter string="Online Channel" name="filter_online" domain="[('channel_online', '=', True)]"/>
+                <filter string="Catalog Channel" name="filter_catalog" domain="[('channel_catalog', '=', True)]"/>
+                <filter string="Physical Store" name="filter_physical" domain="[('channel_physical_store', '=', True)]"/>
+                <separator/>
+                <filter string="Active" name="filter_active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Connector" name="group_connector" context="{'group_by': 'zid_connector_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'location_type'}"/>
+                    <filter string="City" name="group_city" context="{'group_by': 'city_name'}"/>
+                    <filter string="Country" name="group_country" context="{'group_by': 'country_name'}"/>
+                    <filter string="Default" name="group_default" context="{'group_by': 'is_default'}"/>
+                    <filter string="Enabled" name="group_enabled" context="{'group_by': 'is_enabled'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_location" model="ir.actions.act_window">
+        <field name="name">Zid Locations</field>
+        <field name="res_model">zid.location</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zid_location_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Zid locations found
+            </p>
+            <p>
+                Sync locations from your Zid connector to see them here.
+            </p>
+        </field>
+    </record>
+
+    <!-- Update Zid Connector Form View -->
+
+    <!-- Menu Items -->
+</odoo>

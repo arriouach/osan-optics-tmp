@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Server Action for Product Lines -->
+        <record id="action_server_create_product_lines" model="ir.actions.server">
+            <field name="name">Create Zid Store Lines</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="binding_view_types">tree</field>
+            <field name="state">code</field>
+            <field name="code">
+if records:
+    action = {
+        'name': 'Create Store Lines for Products',
+        'type': 'ir.actions.act_window',
+        'res_model': 'zid.product.line.create.wizard',
+        'view_mode': 'form',
+        'target': 'new',
+        'context': {
+            'default_product_ids': records.ids,
+            'ids': records.ids,
+            'active_model': 'product.template'
+        }
+    }
+    action
+            </field>
+        </record>
+        
+        <!-- Server Action for Syncing Product Lines -->
+        <record id="action_server_sync_product_lines" model="ir.actions.server">
+            <field name="name">Sync Zid Product Lines</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="binding_view_types">tree</field>
+            <field name="state">code</field>
+            <field name="code">
+if records:
+    # Get all product lines for selected products
+    lines = env['zid.product.line'].search([
+        ('product_template_id', 'in', records.ids)
+    ])
+    
+    if lines:
+        success_count = 0
+        error_count = 0
+        
+        for line in lines:
+            try:
+                line.sync_to_zid()
+                success_count += 1
+            except Exception as e:
+                error_count += 1
+                
+        message = 'Synced %d lines successfully' % success_count
+        if error_count:
+            message += ', %d failed' % error_count
+            
+        # Display notification
+        env.user.notify_success(message) if success_count else env.user.notify_warning(message)
+    else:
+        env.user.notify_warning('No Zid store lines found for selected products')
+            </field>
+        </record>
+    </data>
+</odoo>

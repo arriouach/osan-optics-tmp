@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_zid_attribute_tree" model="ir.ui.view">
+        <field name="name">zid.attribute.tree</field>
+        <field name="model">zid.attribute</field>
+        <field name="arch" type="xml">
+            <list string="Zid Attributes">
+                <field name="display_name"/>
+                <field name="name_en"/>
+                <field name="name_ar"/>
+                <field name="value_en"/>
+                <field name="value_ar"/>
+                <field name="slug"/>
+                <field name="odoo_attribute_id"/>
+                <field name="odoo_value_id"/>
+                <field name="zid_connector_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zid_attribute_form" model="ir.ui.view">
+        <field name="name">zid.attribute.form</field>
+        <field name="model">zid.attribute</field>
+        <field name="arch" type="xml">
+            <form string="Zid Attribute">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_odoo_attribute"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-link"
+                        >
+                            <span>Create Odoo Attribute</span>
+                        </button>
+                    </div>
+
+                    <group>
+                        <group string="Zid Information">
+                            <field name="zid_connector_id"/>
+                            <field name="zid_attribute_id"/>
+                            <field name="slug"/>
+                        </group>
+                        <group string="Names">
+                            <field name="name_en"/>
+                            <field name="name_ar"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Values">
+                            <field name="value_en"/>
+                            <field name="value_ar"/>
+                        </group>
+                        <group string="Odoo Link">
+                            <field name="odoo_attribute_id"/>
+                            <field name="odoo_value_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="notes" placeholder="Add notes here..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_attribute" model="ir.actions.act_window">
+        <field name="name">Zid Attributes</field>
+        <field name="res_model">zid.attribute</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu -->
+</odoo>

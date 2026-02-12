@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Order Import Cron Job -->
+    <record id="cron_zid_order_import" model="ir.cron">
+        <field name="name">Zid Order Import</field>
+        <field name="model_id" ref="model_zid_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_orders()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+        <field name="priority">5</field>
+    </record>
+
+    <!-- Zid Product Import Cron Job -->
+    <record id="cron_zid_product_import" model="ir.cron">
+        <field name="name">Zid Product Import</field>
+        <field name="model_id" ref="model_zid_product"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_products()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+        <field name="priority">5</field>
+    </record>
+
+    <!-- Zid Order Status Sync Cron Job -->
+    <record id="cron_zid_order_status_sync" model="ir.cron">
+        <field name="name">Zid Order Status Sync</field>
+        <field name="model_id" ref="model_zid_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_order_status()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+        <field name="priority">5</field>
+    </record>
+
+    <!-- Zid Queue Processing Cron Job -->
+    <record id="cron_zid_queue_processing" model="ir.cron">
+        <field name="name">Zid: Process Data Queues</field>
+        <field name="model_id" ref="model_zid_queue_ept"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_process_queues()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+        <field name="priority">4</field>
+    </record>
+
+    <!-- Zid Queue Cleanup Cron Job -->
+    <record id="cron_zid_queue_cleanup" model="ir.cron">
+        <field name="name">Zid Queue Cleanup</field>
+        <field name="model_id" ref="model_zid_queue_ept"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_cleanup_empty_queues()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Zid Expired Locks Check Cron Job -->
+    <record id="cron_zid_expired_locks_check" model="ir.cron">
+        <field name="name">Zid: Check Expired Import Locks</field>
+        <field name="model_id" ref="model_zid_connector"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_check_expired_locks()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+        <field name="priority">3</field>
+    </record>
+</odoo>

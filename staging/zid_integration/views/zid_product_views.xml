@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Product Tree View -->
+    <record id="view_zid_product_tree" model="ir.ui.view">
+        <field name="name">zid.product.tree</field>
+        <field name="model">zid.product</field>
+        <field name="arch" type="xml">
+            <list string="Zid Products"
+                  multi_edit="1"
+                  decoration-muted="is_draft"
+                  decoration-danger="not is_published"
+                  decoration-warning="quantity &lt;= 0 and not is_infinite">
+                <field name="sequence" widget="handle"/>
+                <field name="main_image" widget="image" options="{'size': [64, 64]}" string="Image" optional="show"/>
+                <field name="zid_product_id" readonly="1" optional="show"/>
+                <field name="sku" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="name_ar" readonly="1" optional="show"/>
+                <field name="odoo_product_id" optional="show"/>
+                <field name="product_class" readonly="1"/>
+                <field name="price" readonly="1" widget="monetary" options="{'currency_field': 'currency_code'}"/>
+                <field name="sale_price" readonly="1" widget="monetary" options="{'currency_field': 'currency_code'}" optional="show"/>
+                <field name="quantity" readonly="1" decoration-danger="quantity &lt;= 0 and not is_infinite"/>
+                <field name="is_infinite" readonly="1" optional="hide"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="is_draft" optional="hide" readonly="1"/>
+                <field name="rating_average" optional="show" readonly="1"/>
+                <field name="sold_products_count" optional="show" readonly="1"/>
+                <field name="last_sync_date" widget="datetime" optional="show" readonly="1"/>
+                <field name="currency_code" invisible="1"/>
+                <field name="zid_connector_id" optional="hide" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Zid Product Form View -->
+    <record id="view_zid_product_form" model="ir.ui.view">
+        <field name="name">zid.product.form</field>
+        <field name="model">zid.product</field>
+        <field name="arch" type="xml">
+            <form string="Zid Product">
+                <header>
+                    <button name="action_create_odoo_product"
+                            string="Create in Odoo"
+                            type="object"
+                            class="btn-primary"
+                            invisible="odoo_product_id"/>
+                    <button name="action_view_odoo_product"
+                            string="View Odoo Product"
+                            type="object"
+                            class="btn-success"
+                            invisible="not odoo_product_id"/>
+
+                    <button name="action_relink_odoo_product"
+                            string="Link to Odoo Product"
+                            type="object"
+                            class="btn-warning"
+                            icon="fa-link"
+                            help="Link this Zid product to an Odoo product and sync all data"/>
+                    <field name="is_published" widget="boolean_button"
+                           options='{"terminology": "active"}'/>
+                </header>
+                <sheet>
+
+                    <widget name="web_ribbon"
+                            text="Draft"
+                            invisible="not is_draft"/>
+                    <widget name="web_ribbon"
+                            text="Unpublished"
+                            bg_color="bg-danger"
+                            invisible="is_published or is_draft"/>
+                    <widget name="web_ribbon"
+                            text="Out of Stock"
+                            bg_color="bg-warning"
+                            invisible="is_infinite or quantity > 0"/>
+
+                    <field name="main_image" widget="image" class="oe_avatar"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <field name="name" placeholder="Product Name (English)"/>
+                        </h1>
+                        <field name="name_ar" placeholder="Product Name (Arabic)" invisible="not name_ar"/>
+                    </div>
+
+                    <group>
+                        <group string="General Information">
+                            <field name="zid_connector_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="zid_product_id" readonly="1"/>
+                            <field name="parent_id" readonly="1" invisible="not parent_id"/>
+                            <field name="product_class"/>
+                            <field name="sku"/>
+                            <field name="barcode"/>
+                            <field name="slug" readonly="1"/>
+                        </group>
+
+                        <group string="Status">
+                            <field name="is_external_product" readonly="1"/>
+                            <field name="is_draft"/>
+                            <field name="has_options" readonly="1"/>
+                            <field name="has_fields" readonly="1"/>
+                            <field name="display_order"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Pricing" name="pricing">
+                            <group>
+                                <group string="Prices">
+                                    <field name="price"/>
+                                    <field name="sale_price"/>
+                                    <field name="cost"/>
+                                    <field name="formatted_price" readonly="1" invisible="not formatted_price"/>
+                                    <field name="formatted_sale_price" readonly="1" invisible="not formatted_sale_price"/>
+                                </group>
+                                <group string="Currency">
+                                    <field name="currency_code" readonly="1"/>
+                                    <field name="currency_symbol" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <group string="Sale Period" invisible="not sale_price_period_start and not sale_price_period_end">
+                                <field name="sale_price_period_start" widget="datetime"/>
+                                <field name="sale_price_period_end" widget="datetime"/>
+                            </group>
+                        </page>
+
+                        <page string="Inventory" name="inventory">
+                            <group>
+                                <group string="Stock">
+                                    <field name="quantity"/>
+                                    <field name="is_infinite"/>
+                                </group>
+                                <group string="Shipping">
+                                    <field name="requires_shipping"/>
+                                    <field name="is_taxable"/>
+                                    <field name="weight_value" invisible="not requires_shipping"/>
+                                    <field name="weight_unit" invisible="not requires_shipping"/>
+                                </group>
+                            </group>
+
+                            <separator string="Stock by Location"/>
+                            <field name="zid_location_ids" readonly="1">
+                                <list string="Location Stock" editable="bottom" create="false" delete="false">
+                                    <field name="location_id" options="{'no_open': True}"/>
+                                    <field name="location_type"/>
+                                    <field name="quantity" sum="Total Quantity"/>
+                                    <field name="is_infinite"/>
+                                    <field name="display_quantity"/>
+                                    <field name="stock_id" optional="hide"/>
+                                </list>
+                            </field>
+
+                            <separator string="Raw Stock Data" invisible="not stocks_data"/>
+                            <field name="stocks_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not stocks_data"/>
+                        </page>
+
+                        <page string="Media" name="media">
+                            <field name="zid_image_ids" mode="kanban">
+                                <kanban string="Gallery Images">
+                                    <field name="id"/>
+                                    <field name="image"/>
+                                    <templates>
+                                        <t t-name="card">
+                                            <div class="o_kanban_image_container">
+                                                <field name="image" widget="image" class="o_kanban_image"/>
+                                            </div>
+                                            <div class="o_kanban_details">
+                                                <div class="o_kanban_record_top">
+                                                    <div class="o_kanban_record_headings">
+                                                        <strong class="o_kanban_record_title">
+                                                            Sequence: <field name="sequence"/>
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+
+                        <page string="Description" name="description">
+                            <group string="English">
+                                <field name="description" nolabel="1" colspan="2"/>
+                                <field name="short_description" colspan="2" invisible="not short_description"/>
+                            </group>
+
+                            <group string="Arabic" invisible="not description_ar and not short_description_ar">
+                                <field name="description_ar" nolabel="1" colspan="2"/>
+                                <field name="short_description_ar" colspan="2" invisible="not short_description_ar"/>
+                            </group>
+                        </page>
+
+                        <page string="Purchase Restrictions" name="restrictions">
+                            <group>
+                                <group string="Quantity Limits">
+                                    <field name="min_quantity_per_cart"/>
+                                    <field name="max_quantity_per_cart"/>
+                                </group>
+                                <group string="Availability Period">
+                                    <field name="availability_period_start" widget="datetime"/>
+                                    <field name="availability_period_end" widget="datetime"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="SEO" name="seo">
+                            <group>
+                                <group string="SEO Title">
+                                    <field name="seo_title" placeholder="SEO Title (English)"/>
+                                    <field name="seo_title_ar" placeholder="SEO Title (Arabic)" invisible="not seo_title_ar"/>
+                                </group>
+                                <group string="SEO Description">
+                                    <field name="seo_description" placeholder="SEO Description (English)"/>
+                                    <field name="seo_description_ar" placeholder="SEO Description (Arabic)" invisible="not seo_description_ar"/>
+                                </group>
+                            </group>
+
+                            <separator string="Keywords" invisible="not keywords_data"/>
+                            <field name="keywords_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not keywords_data"/>
+                        </page>
+
+                        <page string="Images &amp; Media" name="media">
+                            <group string="Main Image">
+                                <field name="main_image_url" widget="url" invisible="not main_image_url"/>
+                            </group>
+
+                            <separator string="All Images" invisible="not images_data"/>
+                            <field name="images_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not images_data"/>
+                        </page>
+
+                        <page string="Categories &amp; Attributes" name="categories">
+                            <separator string="Categories" invisible="not categories_data"/>
+                            <field name="categories_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not categories_data"/>
+
+                            <separator string="Attributes" invisible="not attributes_data"/>
+                            <field name="attributes_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not attributes_data"/>
+                        </page>
+
+                        <page string="Variants &amp; Options" name="variants" invisible="not has_options and not variants_data">
+                            <separator string="Variants" invisible="not variants_data"/>
+                            <field name="variants_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not variants_data"/>
+
+                            <separator string="Options" invisible="not options_data"/>
+                            <field name="options_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not options_data"/>
+                        </page>
+
+                        <page string="Group Products" name="group_products" invisible="product_class != 'grouped_product'">
+                            <field name="group_products_data" widget="json_viewer" readonly="1" nolabel="1"/>
+                        </page>
+
+                        <page string="Custom Fields" name="custom_fields" invisible="not has_fields">
+                            <separator string="User Input Fields" invisible="not custom_user_input_fields_data"/>
+                            <field name="custom_user_input_fields_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not custom_user_input_fields_data"/>
+
+                            <separator string="Option Fields" invisible="not custom_option_fields_data"/>
+                            <field name="custom_option_fields_data" widget="json_viewer" readonly="1" nolabel="1" invisible="not custom_option_fields_data"/>
+                        </page>
+
+                        <page string="Statistics" name="statistics">
+                            <group>
+                                <group string="Ratings">
+                                    <field name="rating_average" widget="float" digits="[16,1]"/>
+                                    <field name="rating_count"/>
+                                </group>
+                                <group string="Sales">
+                                    <field name="sold_products_count"/>
+                                    <field name="waiting_customers_count" invisible="not waiting_customers_count"/>
+                                </group>
+                            </group>
+
+                            <group string="Badge" invisible="not badge_body and not badge_icon_code">
+                                <field name="badge_body"/>
+                                <field name="badge_body_ar" invisible="not badge_body_ar"/>
+                                <field name="badge_icon_code" invisible="not badge_icon_code"/>
+                            </group>
+                        </page>
+
+                        <page string="Related Products" name="related" invisible="not related_products_settings">
+                            <field name="related_products_settings" readonly="1"/>
+                            <field name="related_products_title" readonly="1" invisible="not related_products_title"/>
+                        </page>
+
+                        <page string="System Info" name="system">
+                            <group>
+                                <group string="Timestamps">
+                                    <field name="zid_created_at" widget="datetime" readonly="1"/>
+                                    <field name="zid_updated_at" widget="datetime" readonly="1"/>
+                                    <field name="last_sync_date" widget="datetime" readonly="1"/>
+                                </group>
+                                <group string="Integration">
+                                    <label for="odoo_product_id" string="Link to Odoo Product"/>
+                                    <div>
+                                        <field name="odoo_product_id"
+                                               domain="[('sale_ok', '=', True)]"
+                                               options="{'no_create': True}"
+                                               placeholder="Select an Odoo product to link"/>
+                                        <div class="text-muted" colspan="2">
+                                            Select a product and click 'Link to Odoo Product' button to sync all data
+                                        </div>
+                                    </div>
+                                    <field name="html_url" widget="url" readonly="1" invisible="not html_url"/>
+                                </group>
+                            </group>
+
+                            <separator string="Metadata" invisible="not meta and not metafields"/>
+                            <group invisible="not meta and not metafields">
+                                <field name="meta" widget="json_viewer" readonly="1" nolabel="1" invisible="not meta"/>
+                                <field name="metafields" widget="json_viewer" readonly="1" nolabel="1" invisible="not metafields"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Zid Product Search View -->
+    <record id="view_zid_product_search" model="ir.ui.view">
+        <field name="name">zid.product.search</field>
+        <field name="model">zid.product</field>
+        <field name="arch" type="xml">
+            <search string="Search Zid Products">
+                <field name="name" string="Product"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('name_ar', 'ilike', self), ('sku', 'ilike', self)]"/>
+                <field name="sku"/>
+                <field name="barcode"/>
+                <field name="zid_product_id"/>
+
+                <separator/>
+
+                <filter string="Mapped to Odoo" name="mapped" domain="[('odoo_product_id', '!=', False)]"/>
+                <filter string="Not Mapped" name="not_mapped" domain="[('odoo_product_id', '=', False)]"/>
+                
+                <separator/>
+                
+                <filter string="Published" name="published" domain="[('is_published', '=', True)]"/>
+                <filter string="Draft" name="draft" domain="[('is_draft', '=', True)]"/>
+                <filter string="In Stock" name="in_stock" domain="['|', ('is_infinite', '=', True), ('quantity', '&gt;', 0)]"/>
+                <filter string="Out of Stock" name="out_of_stock" domain="[('is_infinite', '=', False), ('quantity', '&lt;=', 0)]"/>
+                <filter string="On Sale" name="on_sale" domain="[('sale_price', '&gt;', 0)]"/>
+                <filter string="Has Variants" name="has_variants" domain="[('has_options', '=', True)]"/>
+                <filter string="Grouped Products" name="grouped" domain="[('product_class', '=', 'grouped_product')]"/>
+
+                <separator/>
+
+                <filter string="Synced Today" name="synced_today"
+                        domain="[('last_sync_date', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
+                                ('last_sync_date', '&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Connector" name="group_connector" context="{'group_by': 'zid_connector_id'}"/>
+                    <filter string="Product Type" name="group_product_class" context="{'group_by': 'product_class'}"/>
+                    <filter string="Published Status" name="group_published" context="{'group_by': 'is_published'}"/>
+                    <filter string="Draft Status" name="group_draft" context="{'group_by': 'is_draft'}"/>
+                    <filter string="Stock Status" name="group_infinite" context="{'group_by': 'is_infinite'}"/>
+                    <filter string="Sync Date" name="group_sync_date" context="{'group_by': 'last_sync_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Zid Product Kanban View -->
+    <record id="view_zid_product_kanban" model="ir.ui.view">
+        <field name="name">zid.product.kanban</field>
+        <field name="model">zid.product</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="sku"/>
+                <field name="price"/>
+                <field name="sale_price"/>
+                <field name="quantity"/>
+                <field name="is_infinite"/>
+                <field name="is_published"/>
+                <field name="is_draft"/>
+                <field name="main_image_url"/>
+                <field name="currency_symbol"/>
+                <field name="rating_average"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-if="record.main_image_url.raw_value"
+                                     t-att-src="record.main_image_url.raw_value"
+                                     alt="Product"
+                                     class="o_image_64_contain"/>
+                                <span t-else="" class="o_image o_image_64_contain bg-100 d-flex align-items-center justify-content-center">
+                                    <i class="fa fa-cube fa-3x text-muted"/>
+                                </span>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="display_name"/>
+                                </strong>
+                                <div class="text-muted">
+                                    <t t-if="record.sku.raw_value">
+                                        SKU: <field name="sku"/>
+                                    </t>
+                                </div>
+                                <div>
+                                    <span class="badge badge-success" t-if="record.is_published.raw_value">Published</span>
+                                    <span class="badge badge-warning" t-if="record.is_draft.raw_value">Draft</span>
+                                    <span class="badge badge-danger" t-if="!record.is_published.raw_value and !record.is_draft.raw_value">Unpublished</span>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <b><field name="price" widget="monetary" options="{'currency_field': 'currency_symbol'}"/></b>
+                                        <span t-if="record.sale_price.raw_value &gt; 0" class="text-danger ml-2">
+                                            <s><field name="sale_price" widget="monetary" options="{'currency_field': 'currency_symbol'}"/></s>
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span t-if="record.is_infinite.raw_value" class="badge badge-info">∞</span>
+                                        <span t-elif="record.quantity.raw_value &gt; 0" class="badge badge-success">
+                                            <field name="quantity"/> in stock
+                                        </span>
+                                        <span t-else="" class="badge badge-danger">Out of Stock</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_product" model="ir.actions.act_window">
+        <field name="name">Zid Products</field>
+        <field name="res_model">zid.product</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_zid_product_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Zid products found
+            </p>
+            <p>
+                Import products from your Zid store using the Import Products button in your Zid Connector.
+            </p>
+        </field>
+    </record>
+
+    <!-- Bulk Action: Create Odoo Products -->
+    <record id="action_bulk_create_odoo_products" model="ir.actions.server">
+        <field name="name">Create in Odoo</field>
+        <field name="model_id" ref="model_zid_product"/>
+        <field name="binding_model_id" ref="model_zid_product"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_create_odoo_products()
+        </field>
+    </record>
+
+    <!-- Menu -->
+</odoo>

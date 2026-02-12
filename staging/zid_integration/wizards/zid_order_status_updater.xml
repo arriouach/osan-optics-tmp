@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Order Status Updater Form View -->
+    <record id="view_zid_order_status_updater_form" model="ir.ui.view">
+        <field name="name">zid.order.status.updater.form</field>
+        <field name="model">zid.order.status.updater</field>
+        <field name="arch" type="xml">
+            <form string="Update Order Status">
+                <sheet>
+                    <group>
+                        <group string="Order Information">
+                            <field name="zid_order_id" readonly="1"/>
+                            <field name="current_status" readonly="1"/>
+                        </group>
+                        <group string="New Status">
+                            <field name="new_status" required="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Shipping Information" invisible="new_status not in ['ready', 'indelivery', 'delivered']">
+                        <field name="inventory_address_id"
+                               invisible="new_status != 'ready'"
+                               required="new_status == 'ready'"/>
+                        <field name="tracking_number"/>
+                        <field name="tracking_url" widget="url"/>
+                        <field name="waybill_url" widget="url"/>
+                    </group>
+
+                    <footer>
+                        <button name="action_update_status"
+                                string="Update Status"
+                                type="object"
+                                class="btn-primary"
+                                data-hotkey="q"/>
+                        <button string="Cancel"
+                                class="btn-secondary"
+                                special="cancel"
+                                data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for status updater -->
+    <record id="action_zid_order_status_updater" model="ir.actions.act_window">
+        <field name="name">Update Order Status</field>
+        <field name="res_model">zid.order.status.updater</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_zid_order_id': id}</field>
+        <field name="binding_model_id" ref="model_zid_sale_order"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

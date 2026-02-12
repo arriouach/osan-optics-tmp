@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Connector Form View -->
+    <record id="view_zid_connector_form" model="ir.ui.view">
+        <field name="name">zid.connector.form</field>
+        <field name="model">zid.connector</field>
+        <field name="arch" type="xml">
+            <form string="Zid Integration">
+                <header>
+                    <button class="oe_highlight" invisible="is_connected or not license_valid" name="connect_to_zid" string="Connect to Zid"
+                            type="object"/>
+                    <button name="check_zid_connection" string="Refresh Connection Status" type="object"/>
+                    <button invisible="not is_connected" name="test_connection" string="Test Connection" type="object" groups="base.group_no_one"/>
+                    <button confirm="Are you sure you want to disconnect from Zid?" invisible="not is_connected"
+                            name="disconnect" string="Disconnect" type="object"/>
+                    <field name="authorization_status" statusbar_visible="not_connected,connected,error,expired"
+                           widget="statusbar"/>
+                    <button class="btn-primary" invisible="authorization_status != 'connected'"
+                            name="%(action_zid_products_connector)d" string="Import Products" type="action"/>
+
+                    <button class="btn-primary" invisible="is_connected == False" name="action_import_variants"
+                            string="Import Variants" type="object"/>
+
+                    <button class="btn-primary" invisible="is_connected == False" name="setup_webhooks"
+                            string="Setup Webhooks" type="object"/>
+                    <button class="btn-info" invisible="is_connected == False" name="list_zid_webhooks"
+                            string="List Webhooks" type="object"/>
+
+
+                    <button name="action_import_orders"
+                            type="object"
+                            string="Import Orders"
+                            class="btn-success"
+                            icon="fa-download"
+                            invisible="not is_connected"/>
+
+                    <button name="%(zid_integration.action_zid_order_fetch_wizard)d"
+                            type="action"
+                            string="Fetch Single Order"
+                            icon="fa-search"
+                            invisible="not is_connected"/>
+
+                    <button name="action_reverse_reason_sync"
+                            type="object"
+                            string="Fetch Reverse Reason"
+                            icon="fa-search"
+                            invisible="not is_connected"/>
+
+                    <button name="action_reverse_waybill_create"
+                            type="object"
+                            string="Reverse Waybill Create"
+                            icon="fa-search"
+                            invisible="not is_connected"/>
+
+                    <button name="action_import_attributes"
+                            string="Import Attributes"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="not is_connected"/>
+
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="app_name" placeholder="Zid Integration Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="main_settings">
+                            <field name="store_id" readonly="is_connected" required="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field invisible="1" name="is_connected"/>
+                        </group>
+                        <group name="connection_info" string="Sync Settings" invisible="not is_connected">
+                            <field name="connection_date"/>
+                            <field name="last_sync_date"/>
+                            <field name="order_import_start_date" 
+                                   help="Fixed start date - set once to define earliest import date"/>
+                            <field name="product_import_start_date" 
+                                   help="Fixed start date - set once to define earliest product import date"/>
+                            <field name="last_order_import_date" readonly="1"
+                                   help="When orders were last imported (used for incremental sync)"/>
+                            <field name="last_product_import_date" readonly="1"
+                                   help="When products were last imported (used for incremental sync)"/>
+                            <field name="last_status_sync_date" readonly="1"
+                                   help="When order statuses were last synced"/>
+                            <field name="store_name"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="config" string="Configuration">
+                            <group>
+                                <group string="Status">
+                                    <field name="active"/>
+                                    <field name="authorization_status"/>
+                                </group>
+                                <group string="Matching Rules">
+                                    <field name="customer_match_by"/>
+                                    <field name="product_match_by"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Proxy Server Configuration">
+                                    <field name="proxy_url" placeholder="https://www.cloudmen.ae" required="1"/>
+                                    <field name="license_key" password="True" placeholder="Enter your license key" required="1"/>
+                                    <field name="database_uuid" readonly="1"/>
+                                </group>
+                                <group string="License Status">
+                                    <field name="license_valid" readonly="1"/>
+                                    <field name="license_status_message" readonly="1"/>
+                                    <button name="action_validate_license" string="Validate License" type="object" class="btn-primary" icon="fa-check-circle"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page name="business_rules" string="Business Rules">
+                            <div class="oe_button_box" name="button_box">
+                                <button name="%(action_zid_product_matching_wizard)d" string="Configure Product Matching" type="action" class="oe_stat_button" icon="fa-cogs">
+                                    <div class="o_field_widget o_stat_info">
+                                        <span class="o_stat_text">Product Matching</span>
+                                        <span class="o_stat_text">Configuration</span>
+                                    </div>
+                                </button>
+                                <button name="%(action_zid_automation_wizard)d" string="Configure Automation" type="action" class="oe_stat_button" icon="fa-magic">
+                                    <div class="o_field_widget o_stat_info">
+                                        <span class="o_stat_text">Order Automation</span>
+                                        <span class="o_stat_text">Configuration</span>
+                                    </div>
+                                </button>
+                                <button name="%(action_zid_payment_mapping_wizard)d" string="Setup Payment Mappings" type="action" class="oe_stat_button" icon="fa-credit-card">
+                                    <div class="o_field_widget o_stat_info">
+                                        <span class="o_stat_text">Payment Mappings</span>
+                                        <span class="o_stat_text">Setup</span>
+                                    </div>
+                                </button>
+                                <button name="%(action_zid_sales_team_wizard)d" string="Configure Sales Team" type="action" class="oe_stat_button" icon="fa-users">
+                                    <div class="o_field_widget o_stat_info">
+                                        <span class="o_stat_text">Sales Team</span>
+                                        <span class="o_stat_text">Configuration</span>
+                                    </div>
+                                </button>
+                            </div>
+                            
+                            <group string="These settings control how orders and products are processed by the proxy server">
+                                <group string="Commission Settings">
+                                    <field name="apply_commission" widget="boolean_toggle"/>
+                                    <field name="commission_rate" invisible="not apply_commission"/>
+                                    <field name="commission_type" invisible="not apply_commission"/>
+                                </group>
+                                <group string="Order Processing Automation">
+                                    <field name="auto_confirm_orders" widget="boolean_toggle" 
+                                           help="Automatically confirm imported orders (moves from Draft to Sales Order)"/>
+                                    <field name="auto_create_invoice" widget="boolean_toggle"
+                                           help="Automatically create invoices for confirmed orders"/>
+                                    <field name="auto_confirm_invoice" widget="boolean_toggle" invisible="not auto_create_invoice"
+                                           help="Automatically validate/post created invoices"/>
+                                    <field name="auto_validate_delivery" widget="boolean_toggle"
+                                           help="Automatically validate delivery orders if stock is available"/>
+                                </group>
+                                <group string="Order Status Sync">
+                                    <field name="auto_sync_order_status" widget="boolean_toggle"
+                                           help="Automatically sync order status changes from Zid to Odoo"/>
+                                    <field name="status_sync_frequency" invisible="not auto_sync_order_status"
+                                           help="How often to check for order status changes in Zid"/>
+                                    <field name="status_sync_days_back" invisible="not auto_sync_order_status"
+                                           help="Only check orders modified in the last X days for status changes"/>
+                                    <field name="sync_all_pending_orders" widget="boolean_toggle" invisible="not auto_sync_order_status"
+                                           help="Include all non-final orders regardless of age (slower but comprehensive)"/>
+                                    <field name="sync_order_status_on_import" widget="boolean_toggle" invisible="not auto_sync_order_status"
+                                           help="Check and update order status when importing new orders"/>
+                                </group>
+                                <group string="Payment Processing Automation">
+                                    <field name="auto_register_payment" widget="boolean_toggle"
+                                           help="Automatically register payment when Zid order is marked as paid"/>
+                                    <field name="auto_reconcile_payment" widget="boolean_toggle" invisible="not auto_register_payment"
+                                           help="Automatically reconcile payment with invoice"/>
+                                    <field name="default_payment_journal_id" invisible="not auto_register_payment"
+                                           help="Default journal for payments when no specific mapping exists"/>
+                                </group>
+                                <group string="Sales Team Configuration">
+                                    <field name="default_user_id" 
+                                           help="Default salesperson to assign to imported orders"/>
+                                    <field name="default_team_id"
+                                           help="Default sales team to assign to imported orders"/>
+                                </group>
+                                
+                                <group string="Sync Status (Debug)" groups="base.group_no_one">
+                                    <field name="order_import_in_progress" readonly="1"/>
+                                    <field name="order_import_started_at" readonly="1"/>
+                                    <field name="product_import_in_progress" readonly="1"/>
+                                    <field name="product_import_started_at" readonly="1"/>
+                                    <field name="order_status_sync_in_progress" readonly="1"/>
+                                    <field name="order_status_sync_started_at" readonly="1"/>
+                                    <field name="import_timeout_minutes" 
+                                           help="Timeout in minutes for import operations (0 = no timeout)"/>
+                                    <button name="action_reset_sync_locks" 
+                                            string="Reset Sync Locks" 
+                                            type="object" 
+                                            class="btn-warning" 
+                                            icon="fa-unlock"
+                                            help="Click this if imports seem stuck (status stays true)"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Order Limits">
+                                    <field name="min_order_amount"/>
+                                    <field name="max_order_amount"/>
+                                </group>
+                                <group/>
+                            </group>
+                            
+                            <group>
+                                <group string="Customer Matching">
+                                    <field name="customer_match_by"/>
+                                </group>
+                                <group string="Product Matching Strategy">
+                                    <field name="product_match_priority" widget="radio"/>
+                                    <field name="product_match_by"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Stock Sync Rules">
+                                    <field name="sync_negative_stock" widget="boolean_toggle"/>
+                                    <field name="stock_rounding"/>
+                                    <field name="safety_stock_days"/>
+                                </group>
+                                <group string="Shipping">
+                                    <field name="shipping_tax_rate"/>
+                                    <field name="default_shipping_product_id"/>
+                                </group>
+                            </group>
+                            
+                            <group>
+                                <group string="Category Settings">
+                                    <field name="auto_create_categories" widget="boolean_toggle"/>
+                                    <field name="default_category_id"/>
+                                </group>
+                                <group/>
+                            </group>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <h4>About Business Rules</h4>
+                                <p>These settings are sent to the proxy server when processing orders and products.</p>
+                                <p>You can change these settings at any time, and they will be applied to future imports.</p>
+                                <ul>
+                                    <li><strong>Commission:</strong> Add a percentage or fixed amount to product prices</li>
+                                    <li><strong>Matching:</strong> Control how customers and products are matched with existing records</li>
+                                    <li><strong>Order Processing:</strong> Set minimum/maximum amounts and auto-confirmation</li>
+                                    <li><strong>Stock Sync:</strong> Control how stock quantities are calculated and rounded</li>
+                                </ul>
+                            </div>
+                        </page>
+
+                        <page name="locations" string="Locations">
+                            <group>
+                                <group>
+                                    <field name="default_location_id" readonly="1"/>
+                                    <button class="btn-primary" invisible="not is_connected" name="get_zid_locations"
+                                            string="Fetch Locations from Zid" type="object"/>
+                                    <button class="btn-primary" invisible="not is_connected" name="test_get_locations"
+                                            string="Test Locations from Zid" type="object" groups="base.group_no_one"/>
+                                </group>
+                                <group>
+                                    <field name="zid_locations_count" readonly="1"/>
+                                </group>
+                            </group>
+                            <field name="zid_location_ids" readonly="1">
+                                <list decoration-muted="not is_enabled" decoration-success="is_default">
+                                    <field name="display_name"/>
+                                    <field name="location_type"/>
+                                    <field name="city_name"/>
+                                    <field name="is_default"/>
+                                    <field name="is_enabled"/>
+                                    <field name="has_stocks"/>
+                                    <field name="fulfillment_priority"/>
+                                </list>
+                            </field>
+
+                        </page>
+                        <page string="Webhooks">
+                            <group>
+                                <field name="webhook_ids"/>
+                                <field name="webhook_secret"/>
+                                <field name="enable_product_sync"/>
+
+                            </group>
+                        </page>
+                        
+                        <!-- NEW: Analytics & Health Page -->
+                        <page name="analytics" string="Analytics &amp; Health" invisible="not is_connected">
+                            <group string="Quick Actions">
+                                <button name="action_sync_health_report" string="📊 View Health Report" type="object" class="btn-primary" icon="fa-heartbeat"/>
+                                <button name="action_bulk_sync_all" string="🔄 Bulk Sync All Data" type="object" class="btn-success" icon="fa-refresh"/>
+                            </group>
+                            
+                            <group string="Real-Time Analytics">
+                                <group string="Overview">
+                                    <field name="order_count" readonly="1"/>
+                                    <field name="product_count" readonly="1"/>
+                                    <field name="customer_count" readonly="1"/>
+                                </group>
+                                <group string="Recent Activity">
+                                    <field name="today_orders" readonly="1"/>
+                                    <field name="week_orders" readonly="1"/>
+                                    <field name="month_revenue" readonly="1" widget="monetary"/>
+                                </group>
+                            </group>
+                            
+                            <group string="Issues &amp; Alerts">
+                                <group>
+                                    <field name="pending_orders" readonly="1"/>
+                                    <field name="low_stock_products" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="sync_errors" readonly="1"/>
+                                    <field name="last_sync_status" readonly="1"/>
+                                </group>
+                            </group>
+                            
+                            <group string="System Health">
+                                <field name="sync_health_score" readonly="1" widget="progressbar"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Zid Connector Kanban/Dashboard View -->
+    <record id="view_zid_connector_kanban" model="ir.ui.view">
+        <field name="name">zid.connector.kanban</field>
+        <field name="model">zid.connector</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_dashboard o_zid_connector_kanban" create="true" quick_create="false">
+                <field name="id"/>
+                <field name="app_name"/>
+                <field name="store_name"/>
+                <field name="authorization_status"/>
+                <field name="is_connected"/>
+                <field name="store_url"/>
+                <field name="connection_date"/>
+                <field name="order_count"/>
+                <field name="product_count"/>
+                <field name="customer_count"/>
+                <field name="color"/>
+                
+                
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_zid_connector_card" style="margin: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;"  t-attf-onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.15)'; this.style.transform='translateY(-2px)';" t-attf-onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'; this.style.transform='translateY(0)';">
+
+                            <!-- Status Ribbon -->
+                            <div class="ribbon ribbon-top-right" t-if="record.authorization_status.raw_value == 'connected'">
+                                <span class="bg-success">Connected</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.authorization_status.raw_value == 'error'">
+                                <span class="bg-danger">Error</span>
+                            </div>
+                            <div class="ribbon ribbon-top-right" t-if="record.authorization_status.raw_value == 'not_connected'">
+                                <span class="bg-secondary">Not Connected</span>
+                            </div>
+                            
+                            <!-- Card Header -->
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="app_name"/></strong>
+                                    </div>
+                                    <div class="o_secondary text-muted" t-if="record.store_name.raw_value">
+                                        <i class="fa fa-store"/> <field name="store_name"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                    <div class="o_kanban_card_manage_section o_kanban_manage_reports">
+                                        <div role="menuitem">
+                                            <a name="action_view_orders" type="object">View Orders</a>
+                                        </div>
+                                        <div role="menuitem">
+                                            <a name="action_view_products" type="object">View Products</a>
+                                        </div>
+                                        <div role="menuitem">
+                                            <a name="action_view_customers" type="object">View Customers</a>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_card_manage_section o_kanban_manage_operations">
+                                        <div role="menuitem">
+                                            <a name="action_open_settings" type="object">Settings</a>
+                                        </div>
+                                        <div role="menuitem" t-if="record.is_connected.raw_value" groups="base.group_no_one">
+                                            <a name="test_connection" type="object">Test Connection</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <!-- Metrics Dashboard -->
+                            <div class="o_kanban_card_body">
+                                <div class="container o_kanban_card_content">
+                                    <div class="row mb-3">
+                                        <div class="col-4 text-center o_kanban_primary_bottom">
+                                            <button name="action_view_orders" type="object" style="width: 100%; display: flex; flex-direction: column; align-items: center; padding: 12px 8px; border: none; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 6px; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(17, 153, 142, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                                <span style="font-size: 24px; font-weight: 700; margin-bottom: 4px;"><t t-esc="record.order_count.value"/></span>
+                                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Orders</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-4 text-center o_kanban_primary_bottom">
+                                            <button name="action_view_products" type="object" style="width: 100%; display: flex; flex-direction: column; align-items: center; padding: 12px 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                                <span style="font-size: 24px; font-weight: 700; margin-bottom: 4px;"><t t-esc="record.product_count.value"/></span>
+                                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Products</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-4 text-center o_kanban_primary_bottom">
+                                            <button name="action_view_customers" type="object" style="width: 100%; display: flex; flex-direction: column; align-items: center; padding: 12px 8px; border: none; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 6px; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(240, 147, 251, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                                                <span style="font-size: 24px; font-weight: 700; margin-bottom: 4px;"><t t-esc="record.customer_count.value"/></span>
+                                                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Customers</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Actions Footer -->
+                            <div class="o_kanban_card_footer">
+                                <div class="o_kanban_footer_left">
+                                    <field name="connection_date" widget="date"/>
+                                </div>
+                                <div class="o_kanban_footer_right" t-if="record.is_connected.raw_value">
+                                    <button name="action_import_orders" type="object" class="btn btn-sm btn-success" title="Import Orders">
+                                        <i class="fa fa-download"/> Orders
+                                    </button>
+                                    <button name="%(action_zid_products_connector)d" type="action" class="btn btn-sm btn-primary" title="Import Products">
+                                        <i class="fa fa-cube"/> Products
+                                    </button>
+                                </div>
+                                <div class="o_kanban_footer_right" t-if="!record.is_connected.raw_value">
+                                    <span class="badge badge-info">OAuth via Proxy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Zid Connector Tree View -->
+    <record id="view_zid_connector_tree" model="ir.ui.view">
+        <field name="name">zid.connector.tree</field>
+        <field name="model">zid.connector</field>
+        <field name="arch" type="xml">
+            <list string="Zid Integrations">
+                <field name="app_name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="store_name"/>
+                <field decoration-danger="authorization_status == 'error'"
+                       decoration-muted="authorization_status == 'not_connected'"
+                       decoration-success="authorization_status == 'connected'"
+                       decoration-warning="authorization_status == 'expired'" name="authorization_status"
+                       widget="badge"/>
+                <field name="connection_date"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <!-- Zid Connector Search View -->
+    <record id="view_zid_connector_search" model="ir.ui.view">
+        <field name="name">zid.connector.search</field>
+        <field name="model">zid.connector</field>
+        <field name="arch" type="xml">
+            <search string="Search Zid Integrations">
+                <field name="app_name"/>
+                <field name="store_name"/>
+                <filter domain="[('authorization_status', '=', 'connected')]" name="connected" string="Connected"/>
+                <filter domain="[('authorization_status', '=', 'not_connected')]" name="not_connected"
+                        string="Not Connected"/>
+                <filter domain="[('authorization_status', '=', 'error')]" name="error" string="Error"/>
+                <filter domain="[('active', '=', True)]" name="active" string="Active"/>
+                <separator/>
+                <!--                <filter domain="[('token_expires_at', '<=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"-->
+                <!--                        name="expires_soon" string="Token Expires Soon"/>-->
+                <group expand="0" string="Group By">
+                    <filter context="{'group_by': 'authorization_status'}" name="group_status" string="Status"/>
+                    <filter context="{'group_by': 'connection_date'}" name="group_connection_date"
+                            string="Connection Date"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

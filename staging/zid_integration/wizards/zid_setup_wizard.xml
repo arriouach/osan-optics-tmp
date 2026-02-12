@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Setup Wizard Form -->
+    <record id="view_zid_setup_wizard" model="ir.ui.view">
+        <field name="name">zid.setup.wizard.form</field>
+        <field name="model">zid.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Zid Integration Setup">
+                <field name="step" invisible="1"/>
+                <field name="connector_id" invisible="1"/>
+                <field name="setup_complete" invisible="1"/>
+                
+                <!-- Welcome Step -->
+                <div invisible="step != 'welcome'">
+                    <div class="o_form_sheet">
+                        <div class="oe_title">
+                            <h1>Welcome to Zid Integration</h1>
+                        </div>
+                        <div class="o_row">
+                            <div class="alert alert-info" role="alert">
+                                <h4>🚀 Let's get you connected to Zid!</h4>
+                                <p>This wizard will help you:</p>
+                                <ul>
+                                    <li>✅ Set up your Zid connection</li>
+                                    <li>✅ Configure business settings</li>
+                                    <li>✅ Import your initial data</li>
+                                    <li>✅ Start syncing with Zid</li>
+                                </ul>
+                                <p><strong>Time required:</strong> 5-10 minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connector Step -->
+                <div invisible="step != 'connector'">
+                    <div class="o_form_sheet">
+                        <div class="oe_title">
+                            <h1>Connector Setup</h1>
+                            <p>Enter your Zid store credentials</p>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="store_id" required="1" placeholder="e.g. 12345"/>
+                                <field name="license_key" required="1" password="True"/>
+                            </group>
+                            <group>
+                                <field name="proxy_url" required="1"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Need help?</strong> Contact your Zid integration provider for these credentials.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connection Step -->
+                <div invisible="step != 'connection'">
+                    <div class="o_form_sheet">
+                        <div class="oe_title">
+                            <h1>Connection Test</h1>
+                            <p>Testing connection to your Zid store...</p>
+                        </div>
+                        <div class="alert alert-success" role="alert" invisible="not connector_id">
+                            <h4>✅ Connector Created Successfully!</h4>
+                            <p>Store ID: <field name="store_id" readonly="1" nolabel="1"/></p>
+                            <p>Click "Next" to test the connection.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuration Step -->
+                <div invisible="step != 'configuration'">
+                    <div class="o_form_sheet">
+                        <div class="oe_title">
+                            <h1>Business Configuration</h1>
+                            <p>Configure how data should be synchronized</p>
+                        </div>
+                        <group>
+                            <group string="Data Matching">
+                                <field name="customer_match_by"/>
+                                <field name="product_match_by"/>
+                            </group>
+                            <group string="Order Processing">
+                                <field name="auto_confirm_orders"/>
+                            </group>
+                        </group>
+                        <group string="Initial Data Import">
+                            <field name="import_products"/>
+                            <field name="import_customers"/>
+                            <field name="import_orders"/>
+                        </group>
+                    </div>
+                </div>
+                
+                <!-- Complete Step -->
+                <div invisible="step != 'complete'">
+                    <div class="o_form_sheet">
+                        <div class="oe_title">
+                            <h1>🎉 Setup Complete!</h1>
+                            <p>Your Zid integration is ready to use</p>
+                        </div>
+                        <div class="alert alert-success" role="alert">
+                            <h4>✅ Successfully Configured:</h4>
+                            <ul>
+                                <li>Zid connector created and connected</li>
+                                <li>Business settings configured</li>
+                                <li>Ready for data synchronization</li>
+                            </ul>
+                        </div>
+                        <group>
+                            <group string="Next Steps">
+                                <div>
+                                    <p><strong>Import Data:</strong> Click "Import Data" to start importing your products, customers, and orders.</p>
+                                    <p><strong>Manual Sync:</strong> Use the connector dashboard to manually sync data anytime.</p>
+                                    <p><strong>Webhooks:</strong> Configure webhooks in Zid for real-time synchronization.</p>
+                                </div>
+                            </group>
+                        </group>
+                    </div>
+                </div>
+                
+                <footer>
+                    <!-- Welcome Step Buttons -->
+                    <div invisible="step != 'welcome'">
+                        <button string="Get Started" name="action_next_step" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </div>
+                    
+                    <!-- Connector Step Buttons -->
+                    <div invisible="step != 'connector'">
+                        <button string="Next" name="action_next_step" type="object" class="btn-primary"/>
+                        <button string="Previous" name="action_previous_step" type="object" class="btn-secondary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </div>
+                    
+                    <!-- Connection Step Buttons -->
+                    <div invisible="step != 'connection'">
+                        <button string="Test Connection" name="action_next_step" type="object" class="btn-primary"/>
+                        <button string="Previous" name="action_previous_step" type="object" class="btn-secondary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </div>
+                    
+                    <!-- Configuration Step Buttons -->
+                    <div invisible="step != 'configuration'">
+                        <button string="Complete Setup" name="action_next_step" type="object" class="btn-primary"/>
+                        <button string="Previous" name="action_previous_step" type="object" class="btn-secondary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </div>
+                    
+                    <!-- Complete Step Buttons -->
+                    <div invisible="step != 'complete'">
+                        <button string="Import Data" name="action_import_data" type="object" class="btn-primary"/>
+                        <button string="Go to Connector" name="action_finish_setup" type="object" class="btn-success"/>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </div>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Setup Wizard Action -->
+    <record id="action_zid_setup_wizard" model="ir.actions.act_window">
+        <field name="name">Zid Integration Setup</field>
+        <field name="res_model">zid.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

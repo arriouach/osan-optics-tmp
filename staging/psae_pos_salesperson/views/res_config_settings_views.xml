@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.psae_pos_salesperson</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="restaurant_section" position="before">
+                <block title="Salespeople" id="pos_salesperson_section">
+                    <setting>
+                        <field name="pos_is_salesperson_mandatory"/>
+                    </setting>
+                    <setting>
+                        <field name="pos_selected_employee_ids" widget="many2many_tags"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+</odoo>

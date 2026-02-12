@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Location Mapping Tree View -->
+    <record id="view_zid_location_mapping_tree" model="ir.ui.view">
+        <field name="name">zid.location.mapping.tree</field>
+        <field name="model">zid.location.mapping</field>
+        <field name="arch" type="xml">
+            <list string="Zid Location Mappings">
+                <field name="product_id"/>
+                <field name="odoo_location_id"/>
+                <field name="zid_location_id"/>
+                <field name="last_synced_qty"/>
+                <field name="last_sync_date"/>
+                <field name="is_active"/>
+            </list></field>
+    </record>
+    <!-- Location Mapping Form View -->
+    <record id="view_zid_location_mapping_form" model="ir.ui.view">
+        <field name="name">zid.location.mapping.form</field>
+        <field name="model">zid.location.mapping</field>
+        <field name="arch" type="xml">
+            <form string="Zid Location Mapping">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="odoo_location_id"/>
+                            <field domain="[('zid_connector_id', '=', product_id.zid_connector_id), ('is_enabled', '=', True)]" name="zid_location_id"/>
+                        </group>
+                        <group>
+                            <field name="last_synced_qty" readonly="1"/>
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="is_active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form></field>
+    </record>
+    <!-- Stock Sync Log Tree View -->
+    <record id="view_zid_stock_sync_log_tree" model="ir.ui.view">
+        <field name="name">zid.stock.sync.log.tree</field>
+        <field name="model">zid.stock.sync.log</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" string="Zid Stock Sync Logs">
+                <field name="sync_date"/>
+                <field name="product_id"/>
+                <field name="odoo_location_id"/>
+                <field name="zid_location_id"/>
+                <field name="old_quantity"/>
+                <field name="new_quantity"/>
+                <field decoration-danger="sync_status == 'failed'" decoration-success="sync_status == 'success'" name="sync_status"/>
+                <field name="error_message"/>
+            </list></field>
+    </record>
+    <!-- Stock Sync Log Form View -->
+    <record id="view_zid_stock_sync_log_form" model="ir.ui.view">
+        <field name="name">zid.stock.sync.log.form</field>
+        <field name="model">zid.stock.sync.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" string="Zid Stock Sync Log">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sync_date"/>
+                            <field name="product_id"/>
+                            <field name="odoo_location_id"/>
+                            <field name="zid_location_id"/>
+                        </group>
+                        <group>
+                            <field name="old_quantity"/>
+                            <field name="new_quantity"/>
+                            <field name="sync_status"/>
+<!--                            <field name="sync_method"/>-->
+                        </group>
+                    </group>
+                    <group invisible="sync_status != 'failed'" string="Error Details">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form></field>
+    </record>
+    <!-- Actions -->
+    <record id="action_zid_location_mapping" model="ir.actions.act_window">
+        <field name="name">Zid Location Mappings</field>
+        <field name="res_model">zid.location.mapping</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="action_zid_stock_sync_log" model="ir.actions.act_window">
+        <field name="name">Zid Stock Sync Logs</field>
+        <field name="res_model">zid.stock.sync.log</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <!-- Menu Items -->
+
+
+
+</odoo>

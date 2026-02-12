@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_automation_wizard_form" model="ir.ui.view">
+        <field name="name">zid.automation.wizard.form</field>
+        <field name="model">zid.automation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Order Automation Configuration">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Order Automation Setup</h1>
+                        <p>Configure how Zid orders should be processed automatically</p>
+                    </div>
+                    
+                    <group>
+                        <field name="connector_id" required="1"/>
+                    </group>
+                    
+                    <group string="Current Settings" invisible="not connector_id">
+                        <group>
+                            <field name="current_auto_confirm_orders" readonly="1"/>
+                            <field name="current_auto_create_invoice" readonly="1"/>
+                            <field name="current_auto_confirm_invoice" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="current_auto_validate_delivery" readonly="1"/>
+                            <field name="current_auto_register_payment" readonly="1"/>
+                            <field name="current_auto_reconcile_payment" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Automation Preset" invisible="not connector_id">
+                        <field name="automation_preset" widget="radio"/>
+                    </group>
+                    
+                    <group string="Custom Settings" invisible="not connector_id or automation_preset != 'custom'">
+                        <group>
+                            <field name="auto_confirm_orders" widget="boolean_toggle"/>
+                            <field name="auto_create_invoice" widget="boolean_toggle"/>
+                            <field name="auto_confirm_invoice" widget="boolean_toggle" invisible="not auto_create_invoice"/>
+                        </group>
+                        <group>
+                            <field name="auto_validate_delivery" widget="boolean_toggle"/>
+                            <field name="auto_register_payment" widget="boolean_toggle"/>
+                            <field name="auto_reconcile_payment" widget="boolean_toggle" invisible="not auto_register_payment"/>
+                        </group>
+                    </group>
+                    
+                    <field name="recommendation" invisible="not connector_id"/>
+                    
+                    <div class="alert alert-warning" role="alert" invisible="not connector_id">
+                        <h5>Automation Flow:</h5>
+                        <ol>
+                            <li><strong>Order Import:</strong> Zid orders are imported and Odoo sale orders are created</li>
+                            <li><strong>Order Confirmation:</strong> Sale orders are confirmed (if enabled)</li>
+                            <li><strong>Invoice Creation:</strong> Invoices are created from confirmed orders (if enabled)</li>
+                            <li><strong>Invoice Confirmation:</strong> Invoices are validated/posted (if enabled)</li>
+                            <li><strong>Payment Registration:</strong> Payments are registered for paid Zid orders (if enabled)</li>
+                            <li><strong>Payment Reconciliation:</strong> Payments are reconciled with invoices (if enabled)</li>
+                            <li><strong>Delivery Validation:</strong> Pickings are validated if stock is available (if enabled)</li>
+                        </ol>
+                        <p><strong>Note:</strong> Each step depends on the previous step being completed successfully.</p>
+                        <p><strong>Payment Requirements:</strong> Configure payment method mappings in Zid Integration > Configuration > Payment Mappings for automatic payment processing.</p>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_apply_settings" string="Apply Settings" type="object" class="btn-primary" invisible="not connector_id"/>
+                    <button name="action_test_automation" string="Test Configuration" type="object" class="btn-secondary" invisible="not connector_id" groups="base.group_no_one"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_automation_wizard" model="ir.actions.act_window">
+        <field name="name">Configure Order Automation</field>
+        <field name="res_model">zid.automation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_zid_automation_wizard"
+              name="Order Automation Config"
+              parent="menu_zid_configuration"
+              action="action_zid_automation_wizard"
+              sequence="16"/>
+</odoo>

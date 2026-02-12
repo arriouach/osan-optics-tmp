@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_payment_mapping_wizard_form" model="ir.ui.view">
+        <field name="name">zid.payment.mapping.wizard.form</field>
+        <field name="model">zid.payment.mapping.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Payment Method Mapping Setup">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Payment Method Mapping</h1>
+                        <p>Configure how Zid payment methods map to Odoo journals</p>
+                    </div>
+                    
+                    <group>
+                        <field name="connector_id" required="1"/>
+                    </group>
+                    
+                    <group string="Statistics" invisible="not connector_id">
+                        <group>
+                            <field name="total_mappings" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="configured_mappings" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Payment Method Mappings" invisible="not connector_id">
+                        <group string="Cash Payments">
+                            <field name="cod_journal_id"/>
+                        </group>
+                        <group string="Card Payments">
+                            <field name="credit_card_journal_id"/>
+                            <field name="debit_card_journal_id"/>
+                            <field name="visa_journal_id"/>
+                            <field name="mastercard_journal_id"/>
+                            <field name="mada_journal_id"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Digital Payments" invisible="not connector_id">
+                        <group>
+                            <field name="apple_pay_journal_id"/>
+                            <field name="stc_pay_journal_id"/>
+                            <field name="wallet_journal_id"/>
+                        </group>
+                        <group>
+                            <field name="bank_transfer_journal_id"/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-info" role="alert" invisible="not connector_id">
+                        <h5>Payment Method Mapping Guide:</h5>
+                        <ul>
+                            <li><strong>Cash on Delivery (COD):</strong> Map to a Cash journal</li>
+                            <li><strong>Credit/Debit Cards:</strong> Map to your bank journal that receives card payments</li>
+                            <li><strong>Digital Wallets:</strong> Map to appropriate bank journals based on your setup</li>
+                            <li><strong>Auto Register Payment:</strong> Payments will be automatically created when Zid orders are marked as paid</li>
+                        </ul>
+                        <p><strong>Note:</strong> You can always modify these mappings later in Zid Integration > Configuration > Payment Mappings</p>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_apply_mappings" string="Apply Mappings" type="object" class="btn-primary" invisible="not connector_id"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_payment_mapping_wizard" model="ir.actions.act_window">
+        <field name="name">Setup Payment Mappings</field>
+        <field name="res_model">zid.payment.mapping.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_zid_payment_mapping_wizard"
+              name="Payment Mapping Setup"
+              parent="menu_zid_configuration"
+              action="action_zid_payment_mapping_wizard"
+              sequence="17"/>
+</odoo>

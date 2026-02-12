@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Location Mapping Wizard -->
+    <record id="view_zid_location_mapping_wizard_form" model="ir.ui.view">
+        <field name="name">zid.location.mapping.wizard.form</field>
+        <field name="model">zid.location.mapping.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Setup Location Mappings">
+                <group>
+                    <field name="product_id"/>
+                    <field name="zid_connector_id"/>
+                </group>
+                <notebook>
+                    <page string="Location Mappings">
+                        <field name="mapping_line_ids" readonly="1"/>
+                    </page>
+                </notebook>
+                <footer>
+                    <button class="btn-primary" name="action_save_mappings" string="Save Mappings" type="object"/>
+                    <button class="btn-secondary" special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_location_mapping_wizard" model="ir.actions.act_window">
+        <field name="name">Setup Location Mappings</field>
+        <field name="res_model">zid.location.mapping.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

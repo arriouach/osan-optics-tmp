@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_normal_form_view" model="ir.ui.view">
+            <field name="name">product.product.form.inherit.psae_pos_salesperson</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view" />
+            <field name="arch" type="xml">
+                <group name="group_general" position="inside">
+                    <field name="is_preselected_in_pos"/>
+                    <field name="hide_on_pos_receipt"/>
+                </group>
+            </field>
+        </record>
+    </data>
+</odoo>

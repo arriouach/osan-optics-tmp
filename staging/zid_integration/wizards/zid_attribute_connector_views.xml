@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_zid_attribute_connector_form" model="ir.ui.view">
+        <field name="name">zid.attribute.connector.form</field>
+        <field name="model">zid.attribute.connector</field>
+        <field name="arch" type="xml">
+            <form string="Import Zid Attributes">
+                <group>
+                    <group>
+                        <field name="zid_connector_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="auto_create_odoo_attributes"/>
+                    </group>
+                    <group>
+                        <field name="state" invisible="1"/>
+                        <field name="total_attributes" invisible="state == 'draft'"/>
+                        <field name="imported_count" invisible="state == 'draft'"/>
+                        <field name="updated_count" invisible="state == 'draft'"/>
+                    </group>
+                </group>
+
+                <group invisible="not error_message">
+                    <field name="error_message" readonly="1" nolabel="1"/>
+                </group>
+
+                <group invisible="state != 'done'">
+                    <field name="attribute_ids" nolabel="1" readonly="1"/>
+                </group>
+
+                <footer>
+                    <button name="action_fetch_attributes" string="Fetch Attributes" type="object" class="btn-primary" invisible="state != 'draft'"/>
+
+                    <button name="action_view_attributes" string="View Attributes" type="object" class="btn-primary" invisible="state != 'done'"/>
+
+                    <button name="action_close" string="Close" type="object" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action للـ Wizard -->
+    <record id="action_zid_attribute_connector" model="ir.actions.act_window">
+        <field name="name">Import Zid Attributes</field>
+        <field name="res_model">zid.attribute.connector</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

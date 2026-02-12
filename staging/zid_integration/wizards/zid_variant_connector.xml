@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View for Import Wizard -->
+    <record id="view_zid_variant_connector_form" model="ir.ui.view">
+        <field name="name">zid.variant.connector.form</field>
+        <field name="model">zid.variant.connector</field>
+        <field name="arch" type="xml">
+            <form string="Import Zid Variants">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,importing,done"/>
+                </header>
+                <sheet>
+                    <!-- Success/Error Messages -->
+                    <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                        <h4 class="alert-heading">Import Completed!</h4>
+                        <p>
+                            <strong>Imported:</strong> <field name="imported_variants" readonly="1"/> variants<br/>
+                            <strong>Updated:</strong> <field name="updated_variants" readonly="1"/> variants<br/>
+                            <strong>Failed:</strong> <field name="failed_variants" readonly="1"/> variants
+                        </p>
+                    </div>
+
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                        <h4 class="alert-heading">Import Failed!</h4>
+                        <p>Check the error log below for details.</p>
+                    </div>
+
+                    <group invisible="state != 'draft'">
+                        <group string="Configuration">
+                            <field name="zid_connector_id" options="{'no_create': True}"/>
+                            <field name="operation_type" widget="radio"/>
+                        </group>
+
+                        <group string="Product Selection" invisible="operation_type not in ['import_product']">
+                            <field name="product_id"
+                                   invisible="product_ids"
+                                   options="{'no_create': True}"
+                                   domain="[('zid_connector_id', '=', zid_connector_id)]"/>
+                            <field name="product_ids"
+                                   widget="many2many_tags"
+                                   invisible="product_id"
+                                   options="{'no_create': True}"
+                                   domain="[('zid_connector_id', '=', zid_connector_id)]"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state != 'draft'">
+                        <page string="Import Options" name="options">
+                            <group>
+                                <group string="Actions">
+                                    <field name="update_existing"/>
+                                    <field name="create_new"/>
+                                </group>
+                                <group string="Sync Options">
+                                    <field name="sync_images"/>
+                                    <field name="sync_stock"/>
+                                    <field name="sync_prices"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Filters" name="filters">
+                            <group>
+                                <group string="Basic Filters">
+                                    <field name="filter_published"/>
+                                    <field name="filter_by_sku"/>
+                                    <field name="sku_pattern"
+                                           invisible="not filter_by_sku"
+                                           placeholder="e.g., TSH-"/>
+                                </group>
+                                <group string="Stock Filters">
+                                    <field name="filter_by_stock"/>
+                                    <field name="stock_filter"
+                                           invisible="not filter_by_stock"/>
+                                </group>
+                            </group>
+                            <group string="Date Filters">
+                                <field name="filter_by_date"/>
+                                <field name="date_from"
+                                       invisible="not filter_by_date"/>
+                                <field name="date_to"
+                                       invisible="not filter_by_date"/>
+                            </group>
+                        </page>
+                    </notebook>
+
+                    <!-- Progress Section -->
+                    <group string="Import Progress" invisible="state == 'draft'">
+                        <field name="progress_text" widget="text" readonly="1" nolabel="1"/>
+                    </group>
+
+                    <!-- Error Log -->
+                    <group string="Error Log" invisible="not error_log">
+                        <field name="error_log" widget="text" readonly="1" nolabel="1"
+                               style="color: red;"/>
+                    </group>
+                </sheet>
+
+                <footer>
+                    <button name="action_import_variants"
+                            string="Import Variants"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_view_imported_variants"
+                            string="View Imported Variants"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'done'"/>
+                    <button string="Close"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Import Wizard -->
+    <record id="action_zid_variant_connector" model="ir.actions.act_window">
+        <field name="name">Import Zid Variants</field>
+        <field name="res_model">zid.variant.connector</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_zid_variant_connector_form"/>
+    </record>
+
+    <!-- Menu Item for Import Wizard -->
+<!--    <menuitem id="menu_zid_variant_import"-->
+<!--              name="Import Variants"-->
+<!--              parent="zid_integration.menu_zid_configuration"-->
+<!--              action="action_zid_variant_connector"-->
+<!--              sequence="50"/>-->
+
+    <!-- Server Action for Scheduled Import -->
+</odoo>

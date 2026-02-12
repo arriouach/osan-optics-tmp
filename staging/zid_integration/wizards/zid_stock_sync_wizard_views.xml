@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Sync Wizard -->
+    <record id="view_zid_stock_sync_wizard_form" model="ir.ui.view">
+        <field name="name">zid.stock.sync.wizard.form</field>
+        <field name="model">zid.stock.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sync Stock to Zid">
+                <group>
+                    <field name="product_id"/>
+                    <field name="sync_all_locations"/>
+                    <field name="location_ids" invisible="sync_all_locations == True" required="sync_all_locations == False" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button class="btn-primary" name="action_sync_stock" string="Sync Stock" type="object"/>
+                    <button class="btn-secondary" special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_stock_sync_wizard" model="ir.actions.act_window">
+        <field name="name">Sync Stock to Zid</field>
+        <field name="res_model">zid.stock.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

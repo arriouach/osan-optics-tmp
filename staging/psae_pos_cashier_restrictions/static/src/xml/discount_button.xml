@@ -1,0 +1,9 @@
+<templates id="template" xml:space="preserve">
+    <t t-inherit="pos_discount.DiscountButton" t-inherit-mode="extension">
+        <xpath expr="//span[hasclass('control-button')]" position="attributes">
+            <attribute name="t-att-class">
+                {'disabled': this.pos.get_cashier().can_discount === false}
+            </attribute>
+        </xpath>
+    </t>
+</templates>

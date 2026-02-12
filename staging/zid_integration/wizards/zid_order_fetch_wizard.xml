@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Order Fetch Wizard Form View -->
+    <record id="view_zid_order_fetch_wizard_form" model="ir.ui.view">
+        <field name="name">zid.order.fetch.wizard.form</field>
+        <field name="model">zid.order.fetch.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Zid Order">
+                <sheet>
+                    <group>
+                        <group string="Connection">
+                            <field name="zid_connector_id" options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Order Details">
+                            <field name="order_id" placeholder="Enter Zid Order ID"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_fetch_order"
+                                string="Fetch Order"
+                                type="object"
+                                class="btn-primary"
+                                data-hotkey="q"/>
+                        <button string="Cancel"
+                                class="btn-secondary"
+                                special="cancel"
+                                data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for fetch wizard -->
+    <record id="action_zid_order_fetch_wizard" model="ir.actions.act_window">
+        <field name="name">Fetch Single Order</field>
+        <field name="res_model">zid.order.fetch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu item for fetch wizard -->
+<!--    <menuitem id="menu_zid_order_fetch"-->
+<!--              name="Fetch Single Order"-->
+<!--              parent="zid_integration.menu_zid_operations"-->
+<!--              action="action_zid_order_fetch_wizard"-->
+<!--              sequence="11"/>-->
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.PaymentScreenButtons" t-inherit-mode="extension" owl="1">
+        <xpath expr="//button[hasclass('partner-button')]" position="after">
+            <button class="button btn btn-light btn-lg w-100 w-md-50 lh-lg text-truncate"
+                    t-att-class="{ 'highlight text-action': currentOrder.get_salesperson() }"
+                    t-on-click="() => this.pos.selectEmployee(currentOrder)">
+                    <i class="fa fa-user me-2" role="img" title="Salesperson"/>
+                <span class="partner-name">
+                    <t t-if="currentOrder.get_salesperson()" t-out="currentOrder.get_salesperson().name"/>
+                    <t t-else="">Salesperson</t>
+                </span>
+            </button>
+        </xpath>
+    </t>
+</templates>

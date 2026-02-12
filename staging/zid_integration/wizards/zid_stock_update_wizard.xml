@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_stock_update_wizard" model="ir.ui.view">
+        <field name="name">zid.stock.update.wizard.form</field>
+        <field name="model">zid.stock.update.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Stock to Zid">
+                <group>
+                    <field name="zid_connector_id" readonly="1"/>
+                    <field name="update_all_products"/>
+                    <field name="product_ids" invisible="update_all_products"/>
+                </group>
+                <footer>
+                    <button string="Update Stock" name="action_update_stock" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,23 @@
+<odoo>
+    <template id="payment_method_form" inherit_id="payment.method_form">
+        <xpath expr="//div[@name='o_payment_inline_form']" position="inside">
+            <t t-if="provider_sudo.code == 'tabby'">
+                <div id="tabbyCard" />
+                <script src="https://checkout.tabby.ai/tabby-card.js" />
+                <script>
+                    const amount = <t t-out="amount" />;
+                    const currency = "<t t-out="currency.name" />";
+                    const lang = "<t t-out="lang" />";
+                    new TabbyCard({
+                    selector: '#tabbyCard',
+                    currency: currency,
+                    lang: lang,
+                    price: amount,
+                    size: 'narrow',
+                    theme: 'default',
+                    });
+                </script>
+            </t>
+        </xpath>
+    </template>
+</odoo>
