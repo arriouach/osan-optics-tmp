@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Action for Bulk Status Sync -->
+    <record id="action_server_bulk_sync_status" model="ir.actions.server">
+        <field name="name">Sync Status from Zid</field>
+        <field name="model_id" ref="model_zid_sale_order"/>
+        <field name="binding_model_id" ref="model_zid_sale_order"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_sync_status_from_zid()
+        </field>
+    </record>
+    
+    <!-- Server Action for Admin Bulk Sync All Pending -->
+    <record id="action_server_bulk_sync_all_pending" model="ir.actions.server">
+        <field name="name">Bulk Sync All Pending Orders</field>
+        <field name="model_id" ref="model_zid_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+action = model.action_bulk_sync_all_pending()
+        </field>
+        <field name="groups_id" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

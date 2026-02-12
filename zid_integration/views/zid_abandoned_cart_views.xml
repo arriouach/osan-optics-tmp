@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_zid_abandoned_cart_tree" model="ir.ui.view">
+            <field name="name">zid.abandoned.cart.tree</field>
+            <field name="model">zid.abandoned.cart</field>
+            <field name="arch" type="xml">
+                <list string="Abandoned Carts" decoration-info="recovery_status=='new'" decoration-muted="recovery_status=='converted'">
+                    <field name="date_abandoned"/>
+                    <field name="customer_name"/>
+                    <field name="total_amount"/>
+                    <field name="recovery_status"/>
+                    <field name="zid_connector_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_zid_abandoned_cart_form" model="ir.ui.view">
+            <field name="name">zid.abandoned.cart.form</field>
+            <field name="model">zid.abandoned.cart</field>
+            <field name="arch" type="xml">
+                <form string="Abandoned Cart">
+                    <header>
+                        <button name="action_create_quotation" string="Create Quotation" type="object" class="btn-primary" invisible="recovery_status == 'converted'"/>
+                        <field name="recovery_status" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="customer_name"/>
+                                <field name="customer_email"/>
+                                <field name="customer_mobile"/>
+                                <field name="partner_id"/>
+                            </group>
+                            <group>
+                                <field name="date_abandoned"/>
+                                <field name="total_amount"/>
+                                <field name="zid_cart_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Cart Lines">
+                                <field name="cart_lines_data" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_zid_abandoned_cart" model="ir.actions.act_window">
+            <field name="name">Abandoned Carts</field>
+            <field name="res_model">zid.abandoned.cart</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No abandoned carts found yet.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

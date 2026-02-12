@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sync Wizard -->
+    <record id="view_zid_product_line_sync_wizard" model="ir.ui.view">
+        <field name="name">zid.product.line.sync.wizard.form</field>
+        <field name="model">zid.product.line.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sync Product Lines">
+                <group>
+                    <field name="product_id"/>
+                    <field name="sync_type" widget="radio"/>
+                </group>
+                <separator string="Select Lines to Sync"/>
+                <field name="line_ids">
+                    <list>
+                        <field name="store_name"/>
+                        <field name="location_name"/>
+                        <field name="zid_product_id"/>
+                        <field name="sync_status"/>
+                        <field name="last_sync_date"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_sync" type="object" string="Sync" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_zid_product_line_sync_wizard" model="ir.actions.act_window">
+        <field name="name">Sync Product Lines</field>
+        <field name="res_model">zid.product.line.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    
+    <!-- Create Lines Wizard -->
+    <record id="view_zid_product_line_create_wizard" model="ir.ui.view">
+        <field name="name">zid.product.line.create.wizard.form</field>
+        <field name="model">zid.product.line.create.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Product Lines">
+                <group>
+                    <field name="product_id"/>
+                </group>
+                <group>
+                    <group string="Store Selection">
+                        <field name="connector_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                    <group string="Location Selection">
+                        <field name="location_selection" widget="radio"/>
+                        <field name="location_ids" widget="many2many_tags" 
+                               options="{'no_create': True}"
+                               invisible="location_selection != 'manual'"/>
+                    </group>
+                </group>
+                <group string="Default Values">
+                    <group>
+                        <field name="default_price"/>
+                        <field name="is_published"/>
+                        <field name="track_inventory"/>
+                    </group>
+                    <group>
+                        <!-- Additional fields can be added here -->
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_create_lines" type="object" string="Create Lines" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_zid_product_line_create_wizard" model="ir.actions.act_window">
+        <field name="name">Create Store Lines</field>
+        <field name="res_model">zid.product.line.create.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

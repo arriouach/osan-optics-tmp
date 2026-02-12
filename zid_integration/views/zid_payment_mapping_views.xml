@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_payment_mapping_tree" model="ir.ui.view">
+        <field name="name">zid.payment.mapping.tree</field>
+        <field name="model">zid.payment.mapping</field>
+        <field name="arch" type="xml">
+            <list string="Payment Mappings" editable="bottom">
+                <field name="zid_connector_id"/>
+                <field name="payment_method_code"/>
+                <field name="payment_method_name"/>
+                <field name="payment_journal_id"/>
+                <field name="payment_term_id"/>
+                <field name="auto_create_invoice"/>
+                <field name="auto_validate_invoice"/>
+                <field name="auto_register_payment"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_zid_payment_mapping_form" model="ir.ui.view">
+        <field name="name">zid.payment.mapping.form</field>
+        <field name="model">zid.payment.mapping</field>
+        <field name="arch" type="xml">
+            <form string="Payment Mapping">
+                <sheet>
+                    <group>
+                        <group string="Zid Configuration">
+                            <field name="zid_connector_id"/>
+                            <field name="payment_method_code"/>
+                            <field name="payment_method_name"/>
+                        </group>
+                        <group string="Odoo Configuration">
+                            <field name="payment_journal_id"/>
+                            <field name="payment_term_id"/>
+                        </group>
+                    </group>
+                    <group string="Workflow Automation">
+                        <group>
+                            <field name="auto_create_invoice"/>
+                            <field name="auto_validate_invoice"/>
+                        </group>
+                        <group>
+                            <field name="auto_register_payment"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_payment_mapping" model="ir.actions.act_window">
+        <field name="name">Payment Mappings</field>
+        <field name="res_model">zid.payment.mapping</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new payment mapping
+            </p>
+            <p>
+                Map Zid payment methods (e.g. 'cod', 'credit_card') to Odoo journals.
+            </p>
+        </field>
+    </record>
+
+</odoo>

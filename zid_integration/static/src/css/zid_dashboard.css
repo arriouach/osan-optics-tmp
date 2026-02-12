@@ -1,0 +1,83 @@
+/* Zid Dashboard Styles */
+
+.o_kanban_dashboard .o_kanban_record {
+    width: 450px;
+}
+
+.o_kanban_dashboard .o_kanban_card_header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.o_kanban_dashboard .o_kanban_card_header_title .o_primary {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.o_kanban_dashboard .o_kanban_card_header_title .o_secondary {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.o_kanban_dashboard .o_kanban_card_content {
+    padding: 15px;
+}
+
+.o_kanban_dashboard .mb8 {
+    margin-bottom: 8px;
+}
+
+.o_kanban_dashboard .badge {
+    font-size: 12px;
+    padding: 4px 10px;
+}
+
+.o_kanban_dashboard .o_kanban_primary_bottom {
+    margin-top: 15px;
+}
+
+.o_kanban_dashboard .btn-block {
+    width: 100%;
+    padding: 10px 5px;
+    font-size: 13px;
+    white-space: normal;
+    height: auto;
+}
+
+.o_kanban_dashboard .btn-block strong {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.o_kanban_dashboard .btn-block small {
+    font-size: 11px;
+}
+
+.o_kanban_dashboard .o_kanban_card_manage_pane {
+    padding: 10px;
+}
+
+.o_kanban_dashboard .o_kanban_card_manage_title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.o_kanban_dashboard .o_kanban_card_manage_section {
+    margin-bottom: 10px;
+}
+
+.o_kanban_dashboard .o_kanban_card_manage_section a {
+    display: block;
+    padding: 5px 0;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.o_kanban_dashboard .o_kanban_card_manage_section a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}

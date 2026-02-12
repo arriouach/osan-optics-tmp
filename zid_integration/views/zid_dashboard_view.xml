@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Dashboard View -->
+    <record id="zid_connector_kanban_dashboard_view" model="ir.ui.view">
+        <field name="name">zid connector dashboard</field>
+        <field name="model">zid.connector</field>
+        <field name="arch" type="xml">
+            <kanban
+                    class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_emipro_kanban" sample="1"
+                    create="false"
+                    can_open="0" style="width:450px;">
+                <field name="app_name"/>
+                <field name="color"/>
+                <field name="order_count"/>
+                <field name="product_count"/>
+                <field name="customer_count"/>
+                <field name="today_orders"/>
+                <field name="week_orders"/>
+                <field name="month_revenue"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''} oe_kanban_global_click record_dashboard_ept">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <a class="oe_kanban_action oe_kanban_action_a">
+                                            <t t-esc="record.app_name.value"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_card_content">
+                                <!-- Main Stats Row -->
+                                <div class="row mb-3">
+                                    <div class="col-4 text-center">
+                                        <a name="action_view_orders" type="object" class="d-block">
+                                            <strong class="d-block" style="font-size: 24px;"><t t-esc="record.order_count.value"/></strong>
+                                            <span class="text-muted">Total Orders</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <a name="action_view_products" type="object" class="d-block">
+                                            <strong class="d-block" style="font-size: 24px;"><t t-esc="record.product_count.value"/></strong>
+                                            <span class="text-muted">Products</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <a name="action_view_customers" type="object" class="d-block">
+                                            <strong class="d-block" style="font-size: 24px;"><t t-esc="record.customer_count.value"/></strong>
+                                            <span class="text-muted">Customers</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Recent Activity Row -->
+                                <div class="row mb-2 border-top pt-2">
+                                    <div class="col-4 text-center">
+                                        <strong class="d-block text-primary"><t t-esc="record.today_orders.value"/></strong>
+                                        <small class="text-muted">Today</small>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <strong class="d-block text-info"><t t-esc="record.week_orders.value"/></strong>
+                                        <small class="text-muted">This Week</small>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <strong class="d-block text-success"><t t-esc="record.month_revenue.value"/></strong>
+                                        <small class="text-muted">Revenue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="menu">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                    <div class="o_kanban_card_manage_title">
+                                        <span>Products</span>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_product_exported)d"
+                                           type="action" title="Exported">
+                                            Exported
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_product_ready_export)d"
+                                           type="action" title="Ready to Export">
+                                            Ready to Export
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_product_published)d"
+                                           type="action" title="Published">
+                                            Published
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_product_unpublished)d"
+                                           type="action" title="UnPublished">
+                                            UnPublished
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                    <div class="o_kanban_card_manage_title">
+                                        <span>Sales</span>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_sale_quotation)d"
+                                           type="action" title="Quotations">
+                                            Quotations
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_abandoned_cart)d"
+                                           type="action" title="Abandoned Carts">
+                                            Abandoned Carts
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_sale_order_only)d"
+                                           type="action" title="Sale Orders">
+                                            Sale Orders
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_sale_order_all)d"
+                                           type="action" title="All Orders">
+                                            All Orders
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                    <div class="o_kanban_card_manage_title">
+                                        <span>Delivery</span>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_picking_waiting)d"
+                                           type="action" title="Waiting Availability">
+                                            Waiting Availability
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_picking_partially)d"
+                                           type="action" title="Partially Available">
+                                            Partially Available
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_picking_ready)d"
+                                           type="action" title="Ready to Transfer">
+                                            Ready to Transfer
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_picking_done)d"
+                                           type="action" title="Transferred">
+                                            Transferred
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-4 o_kanban_card_manage_section o_kanban_manage_view">
+                                    <div class="o_kanban_card_manage_title">
+                                        <span>Invoices</span>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_invoice_open)d"
+                                           type="action" title="Open">
+                                            Open
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_invoice_paid)d"
+                                           type="action" title="Paid">
+                                            Paid
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_invoice_refund)d"
+                                           type="action" title="Refunds">
+                                            Refunds
+                                        </a>
+                                    </div>
+                                    <div role="menuitem">
+                                        <a name="%(zid_integration.action_zid_payout)d"
+                                           type="action" title="Payouts">
+                                            Payouts
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div t-if="widget.editable" role="menuitem" aria-haspopup="true" class="col-6">
+                            <field class="col-8" name="color" widget="kanban_color_picker"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+</odoo>

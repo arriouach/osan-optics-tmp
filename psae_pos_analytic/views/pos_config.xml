@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="pos_config_inherit_form" model="ir.ui.view">
+        <field name="name">pos.config.form.inherit</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='other_devices']" position="after">
+                <setting string="Analytic Accounts" groups="analytic.group_analytic_accounting" help="Accounts selected here will be set on income and expense journal items generated from the PoS Session">
+                    <field name="analytic_account_ids" widget="many2many_tags" string="Accounts"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

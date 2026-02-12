@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Simple Test Action -->
+    <record id="action_test_simple" model="ir.actions.act_window">
+        <field name="name">Test Simple View</field>
+        <field name="res_model">res.company</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    
+    <!-- Test Menu -->
+    <menuitem id="menu_test_simple"
+              name="Test Simple"
+              parent="menu_zid_integration_root"
+              action="action_test_simple"
+              sequence="999"/>
+</odoo>

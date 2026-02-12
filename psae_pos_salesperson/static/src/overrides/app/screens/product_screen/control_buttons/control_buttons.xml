@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.ControlButtons" t-inherit-mode="extension" owl="1">
+        <SelectPartnerButton position="after">
+            <button  class="button btn btn-light btn-lg lh-lg text-truncate w-auto"
+                    t-on-click="() => this.pos.selectEmployee()">
+                <div class="d-flex justify-content-start align-items-center ">
+                    <div t-if="currentOrder?.get_salesperson()" class="text-truncate text-action" aria-label="Salesperson" title="Salesperson">
+                        <t t-out="currentOrder.get_salesperson().name" />
+                    </div>
+                    <div t-else="fw-bolder">
+                        Salesperson
+                    </div>
+                </div>
+            </button>
+        </SelectPartnerButton>
+    </t>
+</templates>

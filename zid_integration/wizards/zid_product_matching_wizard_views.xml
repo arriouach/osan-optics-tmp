@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_product_matching_wizard_form" model="ir.ui.view">
+        <field name="name">zid.product.matching.wizard.form</field>
+        <field name="model">zid.product.matching.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Product Matching Configuration">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Product Matching Strategy</h1>
+                        <p>Configure how Zid orders should match products in Odoo</p>
+                    </div>
+                    
+                    <group>
+                        <field name="connector_id" required="1"/>
+                    </group>
+                    
+                    <group string="Current Settings" invisible="not connector_id">
+                        <group>
+                            <field name="current_priority" readonly="1"/>
+                            <field name="current_method" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_zid_products" readonly="1"/>
+                            <field name="mapped_zid_products" readonly="1"/>
+                            <field name="total_odoo_products" readonly="1"/>
+                            <field name="odoo_products_with_sku" readonly="1"/>
+                            <field name="odoo_products_with_barcode" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="New Settings" invisible="not connector_id">
+                        <group>
+                            <field name="new_priority" widget="radio" required="1"/>
+                        </group>
+                        <group>
+                            <field name="new_method" required="1"/>
+                        </group>
+                    </group>
+                    
+                    <field name="recommendation" invisible="not connector_id"/>
+                    
+                    <div class="alert alert-warning" role="alert" invisible="not connector_id">
+                        <h5>Strategy Explanations:</h5>
+                        <ul>
+                            <li><strong>Zid Mapping First:</strong> Uses your Zid Product → Odoo Product mappings first, then tries SKU/Barcode if no mapping exists. Recommended for most cases.</li>
+                            <li><strong>Direct SKU/Barcode Only:</strong> Ignores all Zid mappings and only matches by SKU/Barcode. Good if you have consistent SKU/Barcode data.</li>
+                            <li><strong>Zid Mapping Only:</strong> Only uses Zid Product mappings. Products without mappings will be skipped. Use when you want strict control.</li>
+                        </ul>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_apply_settings" string="Apply Settings" type="object" class="btn-primary" invisible="not connector_id"/>
+                    <button name="action_test_matching" string="Test Matching" type="object" class="btn-secondary" invisible="not connector_id" groups="base.group_no_one"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_product_matching_wizard" model="ir.actions.act_window">
+        <field name="name">Configure Product Matching</field>
+        <field name="res_model">zid.product.matching.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_zid_product_matching_wizard"
+              name="Product Matching Config"
+              parent="menu_zid_configuration"
+              action="action_zid_product_matching_wizard"
+              sequence="15"/>
+</odoo>

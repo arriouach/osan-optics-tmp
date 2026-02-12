@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Order Note Wizard Form View -->
+    <record id="view_zid_order_note_wizard_form" model="ir.ui.view">
+        <field name="name">zid.order.note.wizard.form</field>
+        <field name="model">zid.order.note.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Order Note">
+                <sheet>
+                    <group>
+                        <field name="zid_order_id" readonly="1"/>
+                    </group>
+                    <group string="Note Details">
+                        <field name="comment"
+                               widget="text"
+                               placeholder="Enter your comment here (max 100 characters)"
+                               required="1"/>
+                        <div class="text-muted">
+                            <i class="fa fa-info-circle"/> Maximum 100 characters allowed
+                        </div>
+                    </group>
+                    <footer>
+                        <button name="action_add_note"
+                                string="Add Note"
+                                type="object"
+                                class="btn-primary"
+                                data-hotkey="q"/>
+                        <button string="Cancel"
+                                class="btn-secondary"
+                                special="cancel"
+                                data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for note wizard -->
+    <record id="action_zid_order_note_wizard" model="ir.actions.act_window">
+        <field name="name">Add Order Note</field>
+        <field name="res_model">zid.order.note.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_zid_order_id': id}</field>
+        <field name="binding_model_id" ref="model_zid_sale_order"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

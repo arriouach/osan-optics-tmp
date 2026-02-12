@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_zid_reverse_order_tree" model="ir.ui.view">
+        <field name="name">zid.reverse.order.tree</field>
+        <field name="model">zid.reverse.order</field>
+        <field name="arch" type="xml">
+            <list string="Reverse Orders">
+                <field name="display_name"/>
+                <field name="order_code"/>
+                <field name="consignee_name"/>
+                <field name="consignee_mobile"/>
+                <field name="reverse_reason_id"/>
+                <field name="state" widget="badge" 
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state in ['sent', 'in_progress']"
+                       decoration-info="state == 'waybill_created'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="waybill_tracking_number"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zid_reverse_order_form" model="ir.ui.view">
+        <field name="name">zid.reverse.order.form</field>
+        <field name="model">zid.reverse.order</field>
+        <field name="arch" type="xml">
+            <form string="Reverse Order">
+                <header>
+                    <button name="action_send_to_zid" 
+                            type="object" 
+                            string="Send to Zid" 
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            icon="fa-send"/>
+                    <button name="action_create_waybill" 
+                            type="object" 
+                            string="Create Waybill" 
+                            class="btn-success"
+                            invisible="state not in ['sent', 'in_progress']"
+                            icon="fa-file-text"/>
+                    <button name="action_view_label" 
+                            type="object" 
+                            string="View Label" 
+                            invisible="not waybill_label_url"
+                            icon="fa-print"/>
+                    <button name="action_track_shipment" 
+                            type="object" 
+                            string="Track Shipment" 
+                            invisible="not waybill_tracking_url"
+                            icon="fa-truck"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Order Information">
+                            <field name="zid_connector_id" readonly="state != 'draft'"/>
+                            <field name="zid_order_id" readonly="state != 'draft'" 
+                                   domain="[('zid_connector_id', '=', zid_connector_id)]"/>
+                            <field name="order_code" readonly="1"/>
+                            <field name="zid_reverse_id" readonly="1"/>
+                        </group>
+                        <group string="Reverse Details">
+                            <field name="reverse_reason_id" readonly="state != 'draft'"
+                                   domain="[('zid_connector_id', '=', zid_connector_id)]"/>
+                            <field name="inventory_location_id" readonly="state != 'draft'"/>
+                            <field name="store_id" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Consignee Information">
+                            <group>
+                                <group>
+                                    <field name="consignee_name" readonly="state != 'draft'"/>
+                                    <field name="consignee_mobile" readonly="state != 'draft'"/>
+                                </group>
+                                <group>
+                                    <field name="consignee_city_id" readonly="state != 'draft'"/>
+                                    <field name="consignee_city_name" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Address">
+                                <field name="consignee_address_1" readonly="state != 'draft'"/>
+                                <field name="consignee_address_2" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        
+                        <page string="Waybill Information" invisible="not waybill_id">
+                            <group>
+                                <group>
+                                    <field name="waybill_id" readonly="1"/>
+                                    <field name="waybill_tracking_number" readonly="1"/>
+                                    <field name="waybill_courier" readonly="1"/>
+                                    <field name="waybill_status" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="waybill_cost" readonly="1"/>
+                                    <field name="waybill_label_url" widget="url" readonly="1"/>
+                                    <field name="waybill_tracking_url" widget="url" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Raw Response" groups="base.group_no_one">
+                            <field name="raw_response" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zid_reverse_order_search" model="ir.ui.view">
+        <field name="name">zid.reverse.order.search</field>
+        <field name="model">zid.reverse.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_code"/>
+                <field name="consignee_name"/>
+                <field name="consignee_mobile"/>
+                <field name="waybill_tracking_number"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_sent" string="Sent" domain="[('state','=','sent')]"/>
+                <filter name="filter_waybill" string="Waybill Created" domain="[('state','=','waybill_created')]"/>
+                <separator/>
+                <filter name="filter_today" string="Today" domain="[('create_date','&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0))]"/>
+                <filter name="filter_week" string="This Week" domain="[('create_date','&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                    <filter name="group_reason" string="Reason" context="{'group_by':'reverse_reason_id'}"/>
+                    <filter name="group_connector" string="Connector" context="{'group_by':'zid_connector_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by':'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_reverse_order" model="ir.actions.act_window">
+        <field name="name">Reverse Orders</field>
+        <field name="res_model">zid.reverse.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zid_reverse_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reverse orders found
+            </p>
+            <p>
+                Create reverse orders for Zid orders
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+</odoo>

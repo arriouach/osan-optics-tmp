@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Order Status Sync Cron Job -->
+    <record id="cron_zid_order_status_sync" model="ir.cron">
+        <field name="name">Zid Order Status Sync</field>
+        <field name="model_id" ref="model_zid_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_order_status()</field>
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+
+    <!-- Zid Queue Cleanup Cron Job -->
+    <record id="cron_zid_queue_cleanup" model="ir.cron">
+        <field name="name">Zid Queue Cleanup</field>
+        <field name="model_id" ref="model_zid_queue_ept"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_cleanup_empty_queues()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

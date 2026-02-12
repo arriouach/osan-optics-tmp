@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========== MAIN ACTIONS ========== -->
+    
+    <!-- Zid Dashboard Action (needed by menu structure) -->
+    <record id="action_zid_dashboard" model="ir.actions.act_window">
+        <field name="name">Zid Dashboard</field>
+        <field name="res_model">zid.connector</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Zid Store Connected Yet
+            </p>
+            <p>
+                Click the "New" button to connect your first Zid store.
+                You'll need your Zid API credentials to get started.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Zid Connector Action (needed by menu structure) -->
+    <record id="action_zid_connector" model="ir.actions.act_window">
+        <field name="name">Zid Integrations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">zid.connector</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Zid Integration!
+            </p>
+            <p>
+                Connect your Zid store to Odoo for seamless e-commerce integration.
+            </p>
+        </field>
+    </record>
+
+    <!-- ========== PRODUCT ACTIONS ========== -->
+    
+    <!-- Exported Products -->
+    <record id="action_zid_product_exported" model="ir.actions.act_window">
+        <field name="name">Exported Products</field>
+        <field name="res_model">zid.product</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('zid_product_id', '!=', False)]</field>
+    </record>
+
+    <!-- Ready to Export Products -->
+    <record id="action_zid_product_ready_export" model="ir.actions.act_window">
+        <field name="name">Ready to Export</field>
+        <field name="res_model">zid.product</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('zid_product_id', '=', False)]</field>
+    </record>
+
+    <!-- Published Products -->
+    <record id="action_zid_product_published" model="ir.actions.act_window">
+        <field name="name">Published Products</field>
+        <field name="res_model">zid.product</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('status', '=', 'active')]</field>
+    </record>
+
+    <!-- Unpublished Products -->
+    <record id="action_zid_product_unpublished" model="ir.actions.act_window">
+        <field name="name">UnPublished Products</field>
+        <field name="res_model">zid.product</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('status', '!=', 'active')]</field>
+    </record>
+
+    <!-- ========== SALES ACTIONS ========== -->
+    
+    <!-- Quotations -->
+    <record id="action_zid_sale_quotation" model="ir.actions.act_window">
+        <field name="name">Quotations</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('state', 'in', ['draft', 'sent'])]</field>
+    </record>
+
+    <!-- Sale Orders Only -->
+    <record id="action_zid_sale_order_only" model="ir.actions.act_window">
+        <field name="name">Sale Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id), ('state', 'in', ['sale', 'done'])]</field>
+    </record>
+
+    <!-- All Orders -->
+    <record id="action_zid_sale_order_all" model="ir.actions.act_window">
+        <field name="name">All Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id)]</field>
+    </record>
+
+    <!-- ========== DELIVERY ACTIONS ========== -->
+    
+    <!-- Waiting Availability -->
+    <record id="action_zid_picking_waiting" model="ir.actions.act_window">
+        <field name="name">Waiting Availability</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('sale_id.zid_connector_id', '=', id), ('state', '=', 'confirmed')]</field>
+    </record>
+
+    <!-- Partially Available -->
+    <record id="action_zid_picking_partially" model="ir.actions.act_window">
+        <field name="name">Partially Available</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('sale_id.zid_connector_id', '=', id), ('state', '=', 'assigned'), ('move_ids_without_package.quantity', '&lt;', 'move_ids_without_package.product_uom_qty')]</field>
+    </record>
+
+    <!-- Ready to Transfer -->
+    <record id="action_zid_picking_ready" model="ir.actions.act_window">
+        <field name="name">Ready to Transfer</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('sale_id.zid_connector_id', '=', id), ('state', '=', 'assigned')]</field>
+    </record>
+
+    <!-- Transferred -->
+    <record id="action_zid_picking_done" model="ir.actions.act_window">
+        <field name="name">Transferred</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('sale_id.zid_connector_id', '=', id), ('state', '=', 'done')]</field>
+    </record>
+
+    <!-- ========== INVOICE ACTIONS ========== -->
+    
+    <!-- Open Invoices -->
+    <record id="action_zid_invoice_open" model="ir.actions.act_window">
+        <field name="name">Open Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('invoice_origin', 'ilike', 'ZID'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial'])]</field>
+    </record>
+
+    <!-- Paid Invoices -->
+    <record id="action_zid_invoice_paid" model="ir.actions.act_window">
+        <field name="name">Paid Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('invoice_origin', 'ilike', 'ZID'), ('state', '=', 'posted'), ('payment_state', '=', 'paid')]</field>
+    </record>
+
+    <!-- Refund Invoices -->
+    <record id="action_zid_invoice_refund" model="ir.actions.act_window">
+        <field name="name">Refund Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('invoice_origin', 'ilike', 'ZID'), ('move_type', '=', 'out_refund')]</field>
+    </record>
+
+    <!-- ========== ADDITIONAL ACTIONS ========== -->
+    
+    <!-- Abandoned Carts -->
+    <record id="action_zid_abandoned_cart" model="ir.actions.act_window">
+        <field name="name">Abandoned Carts</field>
+        <field name="res_model">zid.abandoned.cart</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id)]</field>
+    </record>
+
+    <!-- Payouts -->
+    <record id="action_zid_payout" model="ir.actions.act_window">
+        <field name="name">Payouts</field>
+        <field name="res_model">zid.payout</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_zid_connector_id': id}</field>
+        <field name="domain">[('zid_connector_id', '=', id)]</field>
+    </record>
+
+    <!-- Wizard actions referenced by menus -->
+    <record id="action_zid_bulk_sync_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Sync All Data</field>
+        <field name="res_model">zid.bulk.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_zid_abandoned_cart_fetch_wizard" model="ir.actions.act_window">
+        <field name="name">Fetch Abandoned Carts</field>
+        <field name="res_model">zid.abandoned.cart.fetch.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Other actions referenced by menus -->
+    <record id="action_product_zid_errors" model="ir.actions.act_window">
+        <field name="name">Products with Zid Errors</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('zid_sync_status', '=', 'error')]</field>
+        <field name="context">{'search_default_filter_zid_error': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No products with Zid sync errors
+            </p>
+            <p>
+                All products are synced successfully with Zid!
+            </p>
+        </field>
+    </record>
+
+</odoo>

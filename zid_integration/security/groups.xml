@@ -1,0 +1,13 @@
+<odoo>
+    <record id="group_zid_admin" model="res.groups">
+        <field name="name">Zid Administrator</field>
+        <field name="category_id" ref="base.module_category_sales_point_of_sale"/>
+        <field name="comment">Full access to Zid Integration module including configuration, products, orders, and synchronization.</field>
+    </record>
+    
+    <record id="group_zid_user" model="res.groups">
+        <field name="name">Zid User</field>
+        <field name="category_id" ref="base.module_category_sales_point_of_sale"/>
+        <field name="comment">Basic access to view Zid products and orders. Cannot modify configuration.</field>
+    </record>
+</odoo>

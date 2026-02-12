@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="payment_acquirer_form" model="ir.ui.view">
+        <field name="name">Tabby Acquirer Form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position='inside'>
+                <button name="action_register_webhook" string="Register Webhook" type="object" 
+                        invisible="code != 'tabby' or webhook_id"/>
+                <button name="action_remove_webhook" string="Remove Webhook" type="object" 
+                        invisible="code != 'tabby' or not webhook_id"/>
+            </xpath>
+            <xpath expr="//field[@name='image_128']" position="before">
+                <div
+                    class="alert alert-warning" role="alert"
+                    invisible="code != 'tabby' or webhook_id">
+                    Please register a webhook
+                </div>
+            </xpath>
+            <xpath expr='//group[@name="provider_credentials"]' position='inside'>
+                <group>
+                    <field
+                        name="tabby_public_api_key"
+                        password="True"
+                        required="code == 'tabby'" invisible="code != 'tabby'"
+                    />
+                    <field
+                        name="tabby_secret_api_key"
+                        password="True"
+                        required="code == 'tabby'" invisible="code != 'tabby'"
+                    />
+                    <field
+                        name="tabby_merchant_code"
+                        password="True"
+                        required="code == 'tabby'" invisible="code != 'tabby'"
+                    />
+                </group>
+            </xpath>
+            <xpath expr='//group[@name="provider_config"]' position='inside'>
+                <group>
+                    <field
+                        name="supported_currency_ids"
+                        required="code == 'tabby'" invisible="code != 'tabby'"
+                        widget="many2many_tags"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

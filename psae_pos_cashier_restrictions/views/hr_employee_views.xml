@@ -1,0 +1,22 @@
+<odoo>
+    <record id="view_employee_form" model="ir.ui.view">
+        <field name="name">view.employee.form.psae.pos.cashier.restrictions</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form" />
+        <field name="arch" type="xml">
+            <page name="hr_settings" position="after">
+                <page name="cashier_restrictions" string="POS Cashier Access" groups="hr.group_hr_user">
+                    <group>
+                        <field name="can_refund" />
+                        <field name="can_discount" string="Can Apply Discount"/>
+                        <field name="can_change_price" />
+                        <field name="can_change_quantity" string="Can Change Product Quantity" />
+                        <field name="can_remove_line" string="Can Remove Product Line" invisible="can_change_quantity"/>
+                        <field name="can_change_price_list" string="Can Change Pricelist" />
+                        <field name="can_see_cost_margin" string="Can See Cost and Margin"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

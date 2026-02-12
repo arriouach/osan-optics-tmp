@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_zid_product_line_tree" model="ir.ui.view">
+        <field name="name">zid.product.line.tree</field>
+        <field name="model">zid.product.line</field>
+        <field name="arch" type="xml">
+            <list string="Zid Product Lines" multi_edit="1">
+                <field name="product_template_id"/>
+                <field name="store_name"/>
+                <field name="location_name"/>
+                <field name="zid_product_id"/>
+                <field name="zid_sku"/>
+                <field name="is_published"/>
+                <field name="zid_price"/>
+                <field name="zid_quantity"/>
+                <field name="sync_status"/>
+                <field name="last_sync_date"/>
+                <button name="create_in_zid" type="object" string="Create" class="btn-sm btn-primary" icon="fa-plus" invisible="zid_product_id"/>
+                <button name="action_sync_stock" type="object" string="Update Stock" class="btn-sm btn-secondary" icon="fa-refresh" invisible="not zid_product_id"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Form View -->
+    <record id="view_zid_product_line_form" model="ir.ui.view">
+        <field name="name">zid.product.line.form</field>
+        <field name="model">zid.product.line</field>
+        <field name="arch" type="xml">
+            <form string="Zid Product Line">
+                <header>
+                    <button name="create_in_zid" type="object" string="Create in Zid" 
+                            class="btn-primary" invisible="zid_product_id"/>
+                    <button name="add_variants_to_existing_product" type="object" string="Add Variants to Zid" 
+                            class="btn-warning" invisible="not zid_product_id" 
+                            confirm="This will add new variants to the existing product in Zid. Are you sure?"/>
+                    <button name="update_in_zid" type="object" string="Update in Zid" 
+                            class="btn-primary" invisible="not zid_product_id"/>
+                    <button name="action_sync_stock" type="object" string="Update Stock Only" 
+                            class="btn-secondary" invisible="not zid_product_id"/>
+                    <field name="sync_status" widget="statusbar" clickable="0"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="product_template_id" readonly="1"/>
+                        </h1>
+                        <h2>
+                            <field name="store_name"/> - <field name="location_name"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Store Configuration">
+                            <field name="zid_connector_id" options="{'no_create': True}"/>
+                            <field name="zid_location_id" options="{'no_create': True}"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Product Information">
+                            <field name="zid_product_id" readonly="1"/>
+                            <field name="zid_sku"/>
+                            <field name="is_published"/>
+                            <field name="track_inventory"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Pricing">
+                            <field name="zid_price"/>
+                            <field name="zid_compare_price"/>
+                        </group>
+                        <group string="Stock">
+                            <field name="zid_quantity"/>
+                        </group>
+                    </group>
+                    <group string="Sync Information">
+                        <group>
+                            <field name="last_sync_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sync_error_message" readonly="1" 
+                                   invisible="sync_status != 'error'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Search View -->
+    <record id="view_zid_product_line_search" model="ir.ui.view">
+        <field name="name">zid.product.line.search</field>
+        <field name="model">zid.product.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Product Lines">
+                <field name="product_template_id"/>
+                <field name="store_name"/>
+                <field name="location_name"/>
+                <field name="zid_product_id"/>
+                <field name="zid_sku"/>
+                
+                <filter name="published" string="Published" domain="[('is_published','=',True)]"/>
+                <filter name="not_published" string="Not Published" domain="[('is_published','=',False)]"/>
+                <separator/>
+                <filter name="synced" string="Synced" domain="[('sync_status','=','synced')]"/>
+                <filter name="not_synced" string="Not Synced" domain="[('sync_status','=','not_synced')]"/>
+                <filter name="sync_error" string="Sync Error" domain="[('sync_status','=','error')]"/>
+                <separator/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="Archived" domain="[('active','=',False)]"/>
+                
+                <group expand="0" string="Group By">
+                    <filter name="group_product" string="Product" context="{'group_by':'product_template_id'}"/>
+                    <filter name="group_store" string="Store" context="{'group_by':'zid_connector_id'}"/>
+                    <filter name="group_location" string="Location" context="{'group_by':'zid_location_id'}"/>
+                    <filter name="group_sync_status" string="Sync Status" context="{'group_by':'sync_status'}"/>
+                    <filter name="group_published" string="Published" context="{'group_by':'is_published'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Kanban View -->
+    <record id="view_zid_product_line_kanban" model="ir.ui.view">
+        <field name="name">zid.product.line.kanban</field>
+        <field name="model">zid.product.line</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false">
+                <field name="product_template_id"/>
+                <field name="zid_connector_id"/>
+                <field name="zid_location_id"/>
+                <field name="store_name"/>
+                <field name="location_name"/>
+                <field name="zid_product_id"/>
+                <field name="zid_quantity"/>
+                <field name="sync_status"/>
+                <field name="is_published"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb16">
+                                <div class="o_kanban_record_headings mt4">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="product_template_id"/>
+                                    </strong>
+                                </div>
+                                <span class="badge badge-pill badge-info float-right" t-if="record.zid_product_id.raw_value">
+                                    <i class="fa fa-check"/> In Zid
+                                </span>
+                                <span class="badge badge-pill badge-warning float-right" t-if="!record.zid_product_id.raw_value">
+                                    <i class="fa fa-times"/> Not in Zid
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <i class="fa fa-shopping-cart"/> <field name="store_name"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-map-marker"/> <field name="location_name"/>
+                                </div>
+                                <div t-if="record.zid_product_id.raw_value">
+                                    <i class="fa fa-barcode"/> ID: <field name="zid_product_id"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-cubes"/> Stock: <field name="zid_quantity"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="sync_status" widget="badge" decoration-success="sync_status == 'synced'" decoration-warning="sync_status == 'pending'" decoration-danger="sync_status == 'error'"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <button name="create_in_zid" type="object" class="btn btn-sm btn-primary" t-if="!record.zid_product_id.raw_value">
+                                        <i class="fa fa-plus"/> Create
+                                    </button>
+                                    <button name="action_sync_stock" type="object" class="btn btn-sm btn-secondary" t-if="record.zid_product_id.raw_value">
+                                        <i class="fa fa-refresh"/> Sync
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Action -->
+    <record id="action_zid_product_line" model="ir.actions.act_window">
+        <field name="name">Product Store Lines</field>
+        <field name="res_model">zid.product.line</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No product lines configured yet
+            </p>
+            <p>
+                Product lines represent products in different Zid stores and locations.
+                You can configure products for multiple stores from the product form.
+            </p>
+        </field>
+    </record>
+    
+</odoo>

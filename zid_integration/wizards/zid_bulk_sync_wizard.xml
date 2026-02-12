@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bulk Sync Wizard Form -->
+    <record id="view_zid_bulk_sync_wizard" model="ir.ui.view">
+        <field name="name">zid.bulk.sync.wizard.form</field>
+        <field name="model">zid.bulk.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Sync All Data">
+                <field name="state" invisible="1"/>
+                
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Bulk Synchronization</h1>
+                        <p>Sync all data from Zid in one operation</p>
+                    </div>
+                    
+                    <group>
+                        <field name="connector_id"/>
+                    </group>
+                    
+                    <group string="Sync Options" invisible="state != 'draft'">
+                        <group>
+                            <field name="sync_products"/>
+                            <field name="sync_orders"/>
+                            <field name="sync_customers"/>
+                        </group>
+                        <group>
+                            <field name="sync_stock"/>
+                            <field name="sync_categories"/>
+                            <field name="sync_attributes"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Date Range (Optional)" invisible="state != 'draft'">
+                        <field name="use_date_range"/>
+                        <field name="date_from" invisible="not use_date_range" required="use_date_range"/>
+                        <field name="date_to" invisible="not use_date_range" required="use_date_range"/>
+                    </group>
+                    
+                    <!-- Progress Section -->
+                    <group string="Progress" invisible="state == 'draft'">
+                        <field name="progress_log" nolabel="1" widget="text" readonly="1"/>
+                    </group>
+                    
+                    <!-- Results Section -->
+                    <group string="Results" invisible="state not in ['done', 'error']">
+                        <group>
+                            <field name="products_synced" readonly="1"/>
+                            <field name="orders_synced" readonly="1"/>
+                            <field name="customers_synced" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="stock_synced" readonly="1"/>
+                            <field name="errors_count" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                
+                <footer>
+                    <button string="Start Sync" name="action_start_sync" type="object" 
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="View Results" name="action_view_results" type="object" 
+                            class="btn-primary" invisible="state != 'done'"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

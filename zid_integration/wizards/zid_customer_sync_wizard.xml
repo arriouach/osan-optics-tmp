@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_zid_customer_sync_wizard_form" model="ir.ui.view">
+            <field name="name">zid.customer.sync.wizard.form</field>
+            <field name="model">zid.customer.sync.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Synchronize Customers">
+                    <group>
+                        <group>
+                            <field name="zid_connector_id" options="{'no_create': True}"/>
+                            <field name="sync_mode"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_sync_customers" string="Start Sync" type="object" class="btn-primary" data-hotkey="q"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_zid_customer_sync_wizard" model="ir.actions.act_window">
+            <field name="name">Sync Customers</field>
+            <field name="res_model">zid.customer.sync.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

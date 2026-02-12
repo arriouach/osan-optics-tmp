@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Product Template Form View Inheritance -->
+    <record id="view_product_template_form_zid_integration" model="ir.ui.view">
+        <field name="name">product.template.form.zid.integration</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add Zid Data page after inventory tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Zid Data" name="zid_data" groups="zid_integration.group_zid_admin">
+                    <group>
+                        <!-- Connection and Actions Section -->
+                        <group string="Zid Connection" groups="zid_integration.group_zid_admin">
+                            <field name="zid_connector_id" options="{'no_create': True}"/>
+                            <field name="zid_exists"/>
+                            <field name="zid_sync_status" readonly="1"/>
+                            <field name="zid_last_sync" readonly="1"/>
+                        </group>
+
+                        <!-- Action Buttons -->
+                        <group string="Actions" groups="zid_integration.group_zid_admin">
+                            <div class="o_row">
+                                <button name="create_in_zid"
+                                        type="object"
+                                        string="Create in Zid"
+                                        class="btn-primary"
+                                        invisible="zid_exists"/>
+                                <button name="update_in_zid"
+                                        type="object"
+                                        string="Update in Zid"
+                                        class="btn-primary"
+                                        invisible="not zid_exists"/>
+                                <button name="sync_from_zid"
+                                        type="object"
+                                        string="Sync from Zid"
+                                        class="btn-secondary"
+                                        invisible="not zid_exists"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <!-- Zid Product Information -->
+                    <group string="Zid Product Information" invisible="not zid_exists"
+                           groups="zid_integration.group_zid_admin">
+                        <group>
+                            <field name="zid_product_id" readonly="1"/>
+                            <field name="zid_sku" readonly="1"/>
+                            <field name="zid_barcode" readonly="1"/>
+                            <field name="zid_slug" readonly="1"/>
+                            <field name="zid_html_url" widget="url" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="zid_product_class" readonly="1"/>
+                            <field name="zid_structure" readonly="1"/>
+                            <field name="zid_has_options" readonly="1"/>
+                            <field name="zid_has_fields" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Zid Pricing Information -->
+                    <group string="Zid Pricing" invisible="not zid_exists">
+                        <group>
+                            <field name="zid_price" readonly="1"/>
+                            <field name="zid_sale_price" readonly="1"/>
+                            <field name="zid_formatted_price" readonly="1"/>
+                            <field name="zid_formatted_sale_price" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="zid_currency" readonly="1"/>
+                            <field name="zid_currency_symbol" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Zid Stock Information -->
+                    <group string="Zid Stock" invisible="not zid_exists">
+                        <group>
+                            <field name="zid_quantity" readonly="1"/>
+                            <field name="zid_is_infinite" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="zid_requires_shipping" readonly="1"/>
+                            <field name="zid_is_taxable" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Zid Status Information -->
+                    <group string="Zid Status" invisible="not zid_exists">
+                        <group>
+                            <field name="zid_is_published" readonly="1"/>
+                            <field name="zid_is_draft" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="zid_created_at" readonly="1"/>
+                            <field name="zid_updated_at" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Error Message Section -->
+                    <group string="Error Information" invisible="zid_sync_status != 'error'">
+                        <field name="zid_error_message" readonly="1" colspan="2"/>
+                    </group>
+
+                    <!-- Auto Syncing -->
+                    <group string="Stock Auto Sync">
+                        <group>
+                            <field name="auto_sync_stock"/>
+                            <field name="last_stock_sync" readonly="1"/>
+                            <field name="stock_sync_status" readonly="1"/>
+                        </group>
+                        <group>
+                            <div class="o_row">
+                                <button name="create_in_all_zid_stores"
+                                        type="object"
+                                        string="Create in All Stores"
+                                        class="btn-success"
+                                        invisible="not zid_product_line_ids"/>
+                                <button name="sync_all_stock_to_zid"
+                                        type="object"
+                                        string="Sync Stock to All Stores"
+                                        class="btn-primary"
+                                        invisible="not zid_product_line_ids"/>
+                                <button name="%(action_zid_location_mapping_wizard)d"
+                                        type="action"
+                                        string="Setup Location Mappings"
+                                        class="btn-secondary"
+                                        context="{'default_product_id': id}"/>
+                                <button name="%(action_zid_stock_sync_wizard)d"
+                                        type="action"
+                                        string="Sync Stock Now"
+                                        class="btn-secondary"
+                                        context="{'default_product_id': id}"/>
+                                <button name="%(action_zid_stock_debug_wizard)d"
+                                        type="action"
+                                        string="Debug Stock"
+                                        groups="base.group_no_one"
+                                        class="btn-warning"
+                                        context="{'default_product_id': id}"/>
+                            </div>
+                        </group>
+                    </group>
+
+                    <!-- API Response Section -->
+                    <group string="API Response" invisible="not zid_response" groups="base.group_no_one">
+                        <field name="zid_response" readonly="1" widget="ace" options="{'mode': 'json'}" colspan="2"/>
+                    </group>
+                </page>
+
+                <page string="Zid Media" name="zid_media" groups="zid_integration.group_zid_admin">
+                    <field name="zid_image_ids" mode="kanban" readonly="1">
+                        <kanban string="Gallery Images">
+                            <field name="id"/>
+                            <field name="image"/>
+                            <templates>
+                                <t t-name="card">
+                                    <div class="o_kanban_image_container">
+                                        <field name="image" widget="image" class="o_kanban_image"/>
+                                    </div>
+                                    <div class="o_kanban_details">
+                                        <div class="o_kanban_record_top">
+                                            <div class="o_kanban_record_headings">
+                                                <strong class="o_kanban_record_title">
+                                                    Sequence: <field name="sequence"/>
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </page>
+
+                <page string="Zid Products Mapping" name="zid_data" groups="zid_integration.group_zid_admin">
+                    <field name="zid_product_line_ids">
+                        <list editable="bottom">
+                            <field name="zid_connector_id"/>
+                            <field name="zid_location_id"/>
+                            <field name="zid_product_product_id"/>
+                            <field name="zid_product_id"/>
+
+                            <button name="action_get_zid_variants"
+                                    type="object"
+                                    string="Get Zid Variants"
+                                    title="Sync Stock from Odoo to Zid"
+                                    icon="fa-refresh"
+                                    class="btn-primary btn-sm"/>
+
+
+                            <button name="action_sync_stock"
+                                    type="object"
+                                    string="Sync Stock"
+                                    title="Sync Stock from Odoo to Zid"
+                                    icon="fa-refresh"
+                                    class="btn-primary btn-sm"/>
+                            <button name="create_in_zid"
+                                    type="object"
+                                    string="Create in Zid"
+                                    title="Create Product in Zid Store"
+                                    icon="fa-plus-circle"
+                                    class="btn-warning btn-sm"/>
+                            <button name="add_variants_to_existing_product" type="object" string="Add Variants to Zid"
+                                    class="btn-warning"
+                                    confirm="This will add new variants to the existing product in Zid. Are you sure?"/>
+
+                            <!--                            invisible="zid_product_product_id or zid_product_id"-->
+                        </list>
+                    </field>
+
+                </page>
+                <page string="Zid Variants Mapping" name="zid_variants" groups="zid_integration.group_zid_admin">
+                    <field name="zid_variant_mapping_ids">
+                        <list editable="bottom">
+                            <field name="zid_connector_id"/>
+                            <field name="product_tmpl_id" readonly="1"/>
+                            <field name="zid_tmpl_id" readonly="1"/>
+                            <field name="odoo_variant_id"/>
+                            <field name="zid_variant_id"/>
+                            <button name="action_sync_stock"
+                                    type="object"
+                                    string="Sync Stock"
+                                    title="Sync Stock from Odoo to Zid"
+                                    icon="fa-refresh"
+                                    class="btn-primary btn-sm"/>
+                            <button name="create_in_zid"
+                                    type="object"
+                                    string="Create in Zid"
+                                    title="Create Product in Zid Store"
+                                    icon="fa-plus-circle"
+                                    class="btn-warning btn-sm"/>
+                        </list>
+                    </field>
+
+                </page>
+
+
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Template Tree View Inheritance -->
+    <record id="view_product_template_tree_zid_integration" model="ir.ui.view">
+        <field name="name">product.template.tree.zid.integration</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <!-- Add Zid columns to tree view -->
+            <xpath expr="//field[@name='list_price']" position="after">
+                <field name="zid_exists" string="In Zid" optional="show"/>
+                <field name="zid_sync_status" string="Zid Status" optional="hide"/>
+                <field name="zid_product_id" string="Zid ID" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Template Search View Inheritance -->
+    <record id="view_product_template_search_zid_integration" model="ir.ui.view">
+        <field name="name">product.template.search.zid.integration</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <!-- Add Zid filters -->
+            <xpath expr="//filter[@name='filter_to_sell']" position="after">
+                <separator/>
+                <filter string="In Zid" name="filter_in_zid" domain="[('zid_exists', '=', True)]"/>
+                <filter string="Not in Zid" name="filter_not_in_zid" domain="[('zid_exists', '=', False)]"/>
+                <separator/>
+                <filter string="Zid Sync Error" name="filter_zid_error" domain="[('zid_sync_status', '=', 'error')]"/>
+            </xpath>
+
+            <!-- Add group by options -->
+            <xpath expr="//group" position="inside">
+                <filter string="Zid Status" name="groupby_zid_status" context="{'group_by': 'zid_sync_status'}"/>
+                <filter string="Zid Connector" name="groupby_zid_connector" context="{'group_by': 'zid_connector_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

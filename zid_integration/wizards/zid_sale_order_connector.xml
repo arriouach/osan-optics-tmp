@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_zid_sale_order_connector_form" model="ir.ui.view">
+        <field name="name">zid.sale.order.connector.form</field>
+        <field name="model">zid.sale.order.connector</field>
+        <field name="arch" type="xml">
+            <form string="Import Zid Orders">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,importing,done"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                         <field name="error_message"/>
+                    </div>
+
+                    <group invisible="state != 'draft'">
+                        <group string="Connection">
+                            <field name="zid_connector_id" options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Import Settings">
+                            <field name="import_mode"/>
+                            <field name="page_size" groups="base.group_no_one"/>
+                        </group>
+                    </group>
+
+                    <group string="Filters" invisible="state != 'draft'">
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                        <group>
+                            <field name="order_status"/>
+                            <field name="payment_status"/>
+                        </group>
+                    </group>
+
+                    <group string="Advanced" invisible="state != 'draft'">
+                        <field name="order_ids" placeholder="e.g., 12345,67890,11111"/>
+                    </group>
+                    
+                    <group string="Progress" invisible="state == 'draft'">
+                         <group>
+                            <field name="total_fetched"/>
+                            <field name="current_page"/>
+                        </group>
+                         <field name="progress_text" readonly="1" force_save="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_start_import"
+                            string="Start Import"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            data-hotkey="q"/>
+                            
+                    <button name="action_process_batch"
+                            string="Continue Import"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'importing'"/>
+                            
+                     <button name="action_reset"
+                            string="Reset / Start Over"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state == 'draft'"
+                            confirm="Are you sure you want to reset the wizard? This will clear current progress (but not undo imported data)."/>
+
+                    <button string="Close"
+                            class="btn-secondary"
+                            special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open wizard -->
+    <record id="action_zid_sale_order_connector" model="ir.actions.act_window">
+        <field name="name">Import Zid Orders</field>
+        <field name="res_model">zid.sale.order.connector</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_zid_sale_order"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <!-- Server Action for Batching Loop -->
+    <record id="action_zid_import_orders_batch_processing" model="ir.actions.server">
+        <field name="name">Import Orders Batch Processing</field>
+        <field name="model_id" ref="model_zid_sale_order_connector"/>
+        <field name="state">code</field>
+        <field name="code">
+            if env.context.get('active_ids'):
+                action = model.browse(env.context.get('active_id')).action_process_batch()
+        </field>
+    </record>
+</odoo>

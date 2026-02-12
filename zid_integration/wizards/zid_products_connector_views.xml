@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Zid Products Import Wizard Form View -->
+    <record id="view_zid_products_connector_form" model="ir.ui.view">
+        <field name="name">zid.products.connector.form</field>
+        <field name="model">zid.products.connector</field>
+        <field name="arch" type="xml">
+            <form string="Import Products from Zid">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,importing,done"/>
+                </header>
+                <sheet>
+                    <!-- Error/Success Messages -->
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                        <h4 class="alert-heading">Import Failed!</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                        <h4 class="alert-heading">Import Completed!</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state != 'importing'">
+                        <h4 class="alert-heading">Importing...</h4>
+                        <field name="progress_text" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- Main Form -->
+                    <group invisible="state == 'done'">
+                        <group name="connector_info" string="Connector">
+                            <field name="zid_connector_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'draft'"/>
+                            <div class="text-muted" colspan="2" invisible="not last_import_date">
+                                Last import: <field name="last_import_date" widget="datetime" class="oe_inline"/>
+                                (<field name="last_import_count" class="oe_inline"/> products)
+                            </div>
+                        </group>
+
+                        <group name="import_options" string="Import Options">
+                            <field name="import_mode"
+                                   widget="radio"
+                                   readonly="state != 'draft'"/>
+                            <field name="page_size"
+                                   readonly="state != 'draft'"/>
+                            <field name="max_pages"
+                                   readonly="state != 'draft'"
+                                   help="Leave 0 to import all pages"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state == 'done'">
+                        <page string="Filters" name="filters">
+                            <group>
+                                <group string="Product Filters">
+                                    <field name="filter_published_only" readonly="state != 'draft'"/>
+                                    <field name="filter_in_stock_only" readonly="state != 'draft'"/>
+                                    <field name="skip_drafts" readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Attribute Filters">
+                                    <field name="filter_by_attributes" readonly="state != 'draft'"/>
+                                    <field name="attribute_values"
+                                           placeholder="e.g., nike,black,large"
+                                           invisible="not filter_by_attributes"
+                                           required="filter_by_attributes"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Update Options" name="update_options">
+                            <group>
+                                <group string="What to Update">
+                                    <field name="update_prices" readonly="state != 'draft'"/>
+                                    <field name="update_stock" readonly="state != 'draft'"/>
+                                    <field name="update_images" readonly="state != 'draft'"/>
+                                    <div class="text-warning" colspan="2" invisible="not update_images">
+                                        <i class="fa fa-warning"/> Updating images may significantly slow down the import process
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Progress" name="progress" invisible="state == 'draft'">
+                            <group>
+                                <group string="Pages">
+                                    <field name="current_page"/>
+                                    <field name="total_pages" invisible="not total_pages"/>
+                                </group>
+                                <group string="Products">
+                                    <field name="total_products" invisible="not total_products"/>
+                                    <field name="imported_count" invisible="not imported_count"/>
+                                    <field name="updated_count" invisible="not updated_count"/>
+                                    <field name="skipped_count" invisible="not skipped_count"/>
+                                    <field name="error_count" invisible="not error_count"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Errors" name="errors" invisible="not error_log">
+                            <field name="error_log" readonly="1" nolabel="1" style="font-family: monospace;"/>
+                        </page>
+                    </notebook>
+
+                    <!-- Summary Section (shown when done) -->
+                    <div invisible="state != 'done'">
+                        <separator string="Import Summary"/>
+                        <field name="import_summary" readonly="1" nolabel="1"/>
+                    </div>
+                </sheet>
+
+                <footer>
+                    <button name="action_import_products"
+                            string="Import Products"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_view_products"
+                            string="View Products"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'done'"/>
+                    <button name="action_view_errors"
+                            string="View Errors"
+                            type="object"
+                            class="btn-warning"
+                            invisible="not error_log or state == 'draft'"/>
+                    <button string="Close"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the wizard -->
+    <record id="action_zid_products_connector" model="ir.actions.act_window">
+        <field name="name">Import Products from Zid</field>
+        <field name="res_model">zid.products.connector</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_zid_connector"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+    <!-- Menu item in Zid Connector form -->
+<!--    <record id="view_zid_connector_form_inherit_products" model="ir.ui.view">-->
+<!--        <field name="name">zid.connector.form.inherit.products</field>-->
+<!--        <field name="model">zid.connector</field>-->
+<!--        <field name="inherit_id" ref="your_module.view_zid_connector_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//header" position="inside">-->
+<!--                <button name="%(action_zid_products_connector)d"-->
+<!--                        string="Import Products"-->
+<!--                        type="action"-->
+<!--                        class="btn-primary"-->
+<!--                        invisible="authorization_status != 'connected'"/>-->
+<!--            </xpath>-->
+
+<!--&lt;!&ndash;            <xpath expr="//div[@name='button_box']" position="inside">&ndash;&gt;-->
+<!--&lt;!&ndash;                <button class="oe_stat_button"&ndash;&gt;-->
+<!--&lt;!&ndash;                        type="object"&ndash;&gt;-->
+<!--&lt;!&ndash;                        name="action_view_zid_products"&ndash;&gt;-->
+<!--&lt;!&ndash;                        icon="fa-cube"&ndash;&gt;-->
+<!--&lt;!&ndash;                        invisible="not zid_products_count">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <field string="Products"&ndash;&gt;-->
+<!--&lt;!&ndash;                           name="zid_products_count"&ndash;&gt;-->
+<!--&lt;!&ndash;                           widget="statinfo"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                </button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </xpath>&ndash;&gt;-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <!-- Add fields and method to zid.connector model -->
+<!--    <record id="view_zid_connector_form_products_fields" model="ir.ui.view">-->
+<!--        <field name="name">zid.connector.form.products.fields</field>-->
+<!--        <field name="model">zid.connector</field>-->
+<!--        <field name="inherit_id" ref="your_module.view_zid_connector_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//notebook" position="inside">-->
+<!--                <page string="Products" name="products">-->
+<!--                    <group>-->
+<!--                        <group string="Product Statistics">-->
+<!--                            <field name="zid_products_count"/>-->
+<!--                            <field name="zid_products_last_sync"/>-->
+<!--                            <field name="zid_products_published_count"/>-->
+<!--                            <field name="zid_products_draft_count"/>-->
+<!--                        </group>-->
+<!--                        <group string="Sync Settings">-->
+<!--                            <field name="auto_sync_products"/>-->
+<!--                            <field name="sync_products_interval" invisible="not auto_sync_products"/>-->
+<!--                            <field name="last_products_sync_status"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+
+<!--                    <group string="Product Import Log" invisible="not products_import_log">-->
+<!--                        <field name="products_import_log" readonly="1" nolabel="1"/>-->
+<!--                    </group>-->
+<!--                </page>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+</odoo>

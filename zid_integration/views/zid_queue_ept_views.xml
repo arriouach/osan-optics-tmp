@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Queue Line Tree View -->
+    <record id="view_zid_queue_line_ept_tree" model="ir.ui.view">
+        <field name="name">zid.queue.line.ept.tree</field>
+        <field name="model">zid.queue.line.ept</field>
+        <field name="arch" type="xml">
+            <list string="Queue Lines" create="0" edit="0">
+                <field name="zid_id"/>
+                <field name="name"/>
+                <field name="processed_at"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'" decoration-info="state == 'draft'"/>
+                <field name="log"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Queue Header Form View -->
+    <record id="view_zid_queue_ept_form" model="ir.ui.view">
+        <field name="name">zid.queue.ept.form</field>
+        <field name="model">zid.queue.ept</field>
+        <field name="arch" type="xml">
+            <form string="Zid Queue">
+                <header>
+                    <button name="action_process" string="Process Queue" type="object" class="oe_highlight" invisible="state == 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="zid_connector_id"/>
+                            <field name="model_type"/>
+                            <field name="create_date"/>
+                        </group>
+                        <group>
+                            <field name="total_count"/>
+                            <field name="draft_count"/>
+                            <field name="done_count"/>
+                            <field name="failed_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Queue Lines">
+                            <field name="line_ids">
+                                <list decoration-danger="state=='failed'" decoration-success="state=='done'">
+                                    <field name="zid_id"/>
+                                    <field name="name"/>
+                                    <field name="state"/>
+                                    <field name="log"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Queue Header Tree View -->
+    <record id="view_zid_queue_ept_tree" model="ir.ui.view">
+        <field name="name">zid.queue.ept.tree</field>
+        <field name="model">zid.queue.ept</field>
+        <field name="arch" type="xml">
+            <list string="Zid Queues">
+                <field name="name"/>
+                <field name="zid_connector_id"/>
+                <field name="model_type"/>
+                <field name="create_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'" decoration-info="state == 'draft'"/>
+                <field name="total_count"/>
+                <field name="done_count"/>
+                <field name="failed_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_zid_queue_ept" model="ir.actions.act_window">
+        <field name="name">Zid Queues</field>
+        <field name="res_model">zid.queue.ept</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

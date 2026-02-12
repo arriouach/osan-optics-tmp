@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_zid_product_relink_wizard_form" model="ir.ui.view">
+        <field name="name">zid.product.relink.wizard.form</field>
+        <field name="model">zid.product.relink.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Link to Odoo Product">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="product_name"/>
+                        </h1>
+                        <h3>
+                            <field name="product_sku"/>
+                        </h3>
+                    </div>
+                    <group>
+                        <group string="Linking Information">
+                            <field name="zid_product_id" invisible="1"/>
+                            <field name="current_product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
+                            <field name="new_product_id" options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Sync Options">
+                            <field name="update_main_image"/>
+                            <field name="update_sale_price"/>
+                            <field name="sync_zid_media"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_relink" string="Link and Sync" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_product_relink_wizard" model="ir.actions.act_window">
+        <field name="name">Link to Odoo Product</field>
+        <field name="res_model">zid.product.relink.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Bulk Relink Wizard -->
+    <record id="view_zid_product_bulk_relink_wizard_form" model="ir.ui.view">
+        <field name="name">zid.product.bulk.relink.wizard.form</field>
+        <field name="model">zid.product.bulk.relink.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Link to Odoo Products">
+                <sheet>
+                    <group string="Global Sync Options">
+                        <group>
+                            <field name="update_main_image"/>
+                            <field name="update_sale_price"/>
+                            <field name="sync_zid_media"/>
+                        </group>
+                        <group>
+                            <button name="action_auto_match" string="Auto-match by SKU" type="object" class="btn-secondary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Product Mappings">
+                            <field name="line_ids">
+                                <list editable="bottom" create="false">
+                                    <field name="zid_product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
+                                    <field name="product_sku"/>
+                                    <field name="product_name"/>
+                                    <field name="current_product_id" readonly="1" force_save="1" options="{'no_open': True}"/>
+                                    <field name="new_product_id" options="{'no_create': True, 'no_open': True}"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="action_relink_bulk" string="Link and Sync All" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zid_product_bulk_relink_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Link to Odoo Products</field>
+        <field name="res_model">zid.product.bulk.relink.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_zid_product"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>
+

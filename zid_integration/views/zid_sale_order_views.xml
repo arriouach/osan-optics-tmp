@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_zid_sale_order_tree" model="ir.ui.view">
+        <field name="name">zid.sale.order.tree</field>
+        <field name="model">zid.sale.order</field>
+        <field name="arch" type="xml">
+            <list string="Zid Orders">
+                <field name="zid_order_id_display"/>
+                <field name="customer_name"/>
+                <field name="order_status" widget="badge" decoration-success="order_status == 'delivered'" decoration-warning="order_status in ['preparing', 'ready']" decoration-danger="order_status == 'cancelled'"/>
+                <field name="payment_status" widget="badge" decoration-success="payment_status == 'paid'" decoration-warning="payment_status == 'pending'"/>
+                <field name="order_total_string"/>
+                <field name="zid_created_at"/>
+                <field name="zid_connector_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_zid_sale_order_form" model="ir.ui.view">
+        <field name="name">zid.sale.order.form</field>
+        <field name="model">zid.sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Zid Order">
+                <header>
+                    <button name="sync_from_zid" type="object" string="Sync from Zid" class="btn-primary" icon="fa-refresh"/>
+                    <button name="fetch_full_order_details" type="object" string="Fetch Full Order Details" class="btn-warning" icon="fa-download"/>
+                    <button name="action_sync_status_from_zid" type="object" string="Sync Status" class="btn-info" icon="fa-sync"/>
+                    <button name="action_update_status" type="object" string="Update Status"/>
+                    <button name="action_add_note" type="object" string="Add Note"/>
+                    <button name="get_credit_notes" type="object" string="Get Credit Notes"/>
+                    <button name="action_view_in_zid" type="object" string="View in Zid" icon="fa-external-link"/>
+                    <field name="order_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="create_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="sale_order_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Create</span>
+                                <span class="o_stat_text">Sale Order</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="zid_order_id_display" readonly="1"/>
+                        </h1>
+                        <h3>
+                            <field name="order_code" readonly="1"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <group string="Order Information">
+                            <field name="zid_order_id_display" readonly="1"/>
+                            <field name="order_code" readonly="1"/>
+                            <field name="zid_connector_id" readonly="1"/>
+                            <field name="store_name"/>
+                            <field name="order_url" widget="url"/>
+                            <field name="invoice_link" widget="url"/>
+                            <field name="issue_date"/>
+                        </group>
+                        <group string="Status">
+                            <field name="order_status_name"/>
+                            <field name="payment_status"/>
+                            <field name="is_potential_fraud" invisible="not is_potential_fraud"/>
+                            <field name="cod_confirmed" invisible="not cod_confirmed"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Customer">
+                            <group>
+                                <group>
+                                    <field name="customer_id"/>
+                                    <field name="customer_name"/>
+                                    <field name="customer_email"/>
+                                    <field name="customer_mobile"/>
+                                </group>
+                                <group>
+                                    <field name="customer_type"/>
+                                    <field name="customer_verified"/>
+                                    <field name="is_guest_customer"/>
+                                    <field name="customer_note_field"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Financial">
+                            <group>
+                                <group string="Order Amount">
+                                    <field name="currency_code"/>
+                                    <field name="order_total"/>
+                                    <field name="order_total_string"/>
+                                    <field name="products_sum_total_string"/>
+                                </group>
+                                <group string="Transaction">
+                                    <field name="has_different_transaction_currency"/>
+                                    <field name="transaction_reference"/>
+                                    <field name="transaction_amount"/>
+                                    <field name="transaction_amount_string"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Payment">
+                                    <field name="payment_method_name"/>
+                                    <field name="payment_method_code"/>
+                                    <field name="payment_method_type"/>
+                                    <field name="payment_link" widget="url"/>
+                                </group>
+                                <group string="Discount">
+                                    <field name="coupon"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Shipping">
+                            <group>
+                                <group>
+                                    <field name="shipping_method_code"/>
+                                    <field name="requires_shipping"/>
+                                    <field name="should_merchant_set_shipping_method"/>
+                                </group>
+                                <group>
+                                    <field name="inventory_address"/>
+                                    <field name="packages_count"/>
+                                    <field name="weight"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Additional Info">
+                            <group>
+                                <group string="Order Type">
+                                    <field name="is_marketplace_order"/>
+                                    <field name="is_gift_order"/>
+                                    <field name="is_quick_checkout_order"/>
+                                    <field name="is_reseller_transaction"/>
+                                    <field name="is_on_demand"/>
+                                    <field name="is_reactivated"/>
+                                </group>
+                                <group string="Source">
+                                    <field name="source"/>
+                                    <field name="source_code"/>
+                                    <field name="language"/>
+                                </group>
+                            </group>
+                            <separator string="Notes"/>
+                            <group>
+                                <field name="customer_note"/>
+                                <field name="gift_message" invisible="not gift_message"/>
+                            </group>
+                            <separator string="Return Policy"/>
+                            <field name="return_policy" nolabel="1"/>
+                        </page>
+
+                        <page string="System Info">
+                            <group>
+                                <group string="Dates">
+                                    <field name="zid_created_at"/>
+                                    <field name="zid_updated_at"/>
+                                    <field name="delivered_at"/>
+                                    <field name="last_sync_date"/>
+                                </group>
+                                <group string="Tracking">
+                                    <field name="products_count"/>
+                                    <field name="edits_count"/>
+                                    <field name="sale_order_id"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Zid Products">
+                            <group>
+                                <field name="zid_product_lines" widget="text" nolabel="1" readonly="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Raw Data" groups="base.group_no_one">
+                            <field name="raw_data" widget="ace" options="{'mode': 'json'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_zid_sale_order_search" model="ir.ui.view">
+        <field name="name">zid.sale.order.search</field>
+        <field name="model">zid.sale.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="zid_order_id_display"/>
+                <field name="order_code"/>
+                <field name="customer_name"/>
+                <field name="customer_email"/>
+                <field name="customer_mobile"/>
+                <filter name="filter_new" string="New" domain="[('order_status','=','new')]"/>
+                <filter name="filter_preparing" string="Preparing" domain="[('order_status','=','preparing')]"/>
+                <filter name="filter_delivered" string="Delivered" domain="[('order_status','=','delivered')]"/>
+                <filter name="filter_cancelled" string="Cancelled" domain="[('order_status','=','cancelled')]"/>
+                <separator/>
+                <filter name="filter_paid" string="Paid" domain="[('payment_status','=','paid')]"/>
+                <filter name="filter_pending" string="Payment Pending" domain="[('payment_status','=','pending')]"/>
+                <separator/>
+                <filter name="filter_today" string="Today" domain="[('zid_created_at','&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0))]"/>
+                <filter name="filter_week" string="This Week" domain="[('zid_created_at','&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status" context="{'group_by':'order_status'}"/>
+                    <filter name="group_payment" string="Payment Status" context="{'group_by':'payment_status'}"/>
+                    <filter name="group_connector" string="Connector" context="{'group_by':'zid_connector_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by':'zid_created_at:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_zid_sale_order" model="ir.actions.act_window">
+        <field name="name">Zid Orders</field>
+        <field name="res_model">zid.sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_zid_sale_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Zid orders found
+            </p>
+            <p>
+                Import orders from Zid using the Import Orders wizard
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+</odoo>
